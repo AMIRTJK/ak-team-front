@@ -4,7 +4,7 @@ import { LanguageSwitcher } from "@/features/language-switcher/ui/LanguageSwitch
 
 export const HomePage = () => {
   return (
-    <main className="min-h-screen bg-[#161515] overflow-hidden relative font-sans">
+    <main className="min-h-screen bg-[#161515] overflow-x-hidden relative font-sans">
       <LanguageSwitcher />
       <Header />
       <Hero />
