@@ -38,7 +38,6 @@ const megrimRegular = localFont({
   display: "swap",
 });
 
-// 1. Управление камерой (остается неизменным)
 const CameraRig = () => {
   const { camera } = useThree();
 
@@ -76,7 +75,6 @@ const CameraRig = () => {
   return null;
 };
 
-// --- ТЕМА 1: КАМНИ (Оригинал) ---
 const ThemeStones = () => {
   const particles = useMemo(
     () =>
@@ -123,7 +121,6 @@ const ThemeStones = () => {
   );
 };
 
-// --- ТЕМА 2: КИБЕРПРОСТРАНСТВО ---
 const ThemeCyber = () => {
   const particles = useMemo(
     () =>
@@ -190,7 +187,6 @@ const ThemeCyber = () => {
   );
 };
 
-// --- ТЕМА 3: КОСМОС ---
 const ThemeSpace = () => {
   const planets = useMemo(
     () =>
@@ -201,7 +197,7 @@ const ThemeSpace = () => {
           (Math.random() - 0.5) * 30 - 10,
         ],
         scale: Math.random() * 1.5 + 0.1,
-        color: Math.random() > 0.9 ? "#D24A43" : "#EAE4D3",
+        color: Math.random() > 0.9 ? "#D24A43" : "#FFFFFF",
       })),
     [],
   );
@@ -235,7 +231,6 @@ const ThemeSpace = () => {
   );
 };
 
-// ОБНОВЛЕННЫЙ HERO ПРИНИМАЕТ ПРОПС theme
 export const Hero = ({
   theme = "cyber",
 }: {
@@ -243,7 +238,6 @@ export const Hero = ({
 }) => {
   const titleRef = useRef<HTMLHeadingElement>(null);
 
-  // Динамически меняем цвет фона контейнера, чтобы не было резких скачков
   const bgColors = {
     stones: "bg-[#111111]",
     cyber: "bg-[#0A0A0A]",
@@ -265,7 +259,6 @@ export const Hero = ({
       const x = (e.clientX / window.innerWidth) * 2 - 1;
       const y = (e.clientY / window.innerHeight) * 2 - 1;
 
-      // УМЕНЬШИЛИ МНОЖИТЕЛИ: было 50 и 25, стало 25 и 12.5
       xTo(Math.pow(x, 3) * 25);
       yTo(Math.pow(y, 3) * 12.5);
     };
@@ -281,7 +274,6 @@ export const Hero = ({
       <div className="absolute inset-0 z-0">
         <Canvas camera={{ position: [0, 0, 5], fov: 60 }}>
           <CameraRig />
-          {/* Условный рендеринг темы */}
           {theme === "stones" && <ThemeStones />}
           {theme === "cyber" && <ThemeCyber />}
           {theme === "space" && <ThemeSpace />}
@@ -289,11 +281,10 @@ export const Hero = ({
       </div>
 
       <section className="relative z-10 w-full h-full flex flex-col justify-between pt-28 pb-8 md:pt-32 md:pb-10 pointer-events-none">
-        {/* ... ВЕСЬ HTML ИНТЕРФЕЙС БЕЗ ИЗМЕНЕНИЙ ... */}
         <div className="flex-1 flex items-center justify-center w-full">
           <h1
             ref={titleRef}
-            className={`text-[#EAE4D3] text-[20vw] md:text-[14vw] font-[900] tracking-[-0.04em] leading-[0.8] select-none flex flex-col md:flex-row items-center text-center mix-blend-difference will-change-transform uppercase ${megrimRegular.className}`}
+            className={`text-white text-[20vw] md:text-[14vw] font-[900] tracking-[-0.04em] leading-[0.8] select-none flex flex-col md:flex-row items-center text-center mix-blend-difference will-change-transform uppercase ${megrimRegular.className}`}
           >
             A&K TEAM
           </h1>
@@ -304,21 +295,23 @@ export const Hero = ({
             <p className="text-[#D24A43] text-[10px] md:text-xs font-bold tracking-[0.2em] mb-2 md:mb-4 uppercase">
               Web Studio
             </p>
-            <h2 className="text-[#EAE4D3] text-3xl md:text-4xl lg:text-5xl font-serif italic font-bold leading-tight mb-3 md:mb-4">
+            <h2 className="text-white text-3xl md:text-4xl lg:text-5xl font-serif italic font-bold leading-tight mb-3 md:mb-4">
               We craft digital <br className="hidden md:block" /> experiences
             </h2>
-            <p className="text-[#888888] text-xs md:text-sm max-w-[90%] md:max-w-full">
+            <p className="text-zinc-400 text-xs md:text-sm max-w-[90%] md:max-w-full leading-relaxed">
               We engineer the success of your vision through technology and
               innovation.
             </p>
-            <div className="w-full h-[1px] bg-transparent mt-5 md:mt-6 border-dashed border-b border-[#444]"></div>
+            <div className="w-full h-[1px] bg-transparent mt-5 md:mt-6 border-dashed border-b border-white/20"></div>
           </div>
 
           <div className="flex flex-col items-center gap-3 w-full justify-center md:w-auto md:absolute md:left-1/2 md:-translate-x-1/2 relative pointer-events-auto">
-            <span className="text-[#EAE4D3] text-[10px] font-bold tracking-widest uppercase">
+            <span className="text-zinc-400 text-[10px] font-bold tracking-widest uppercase">
               Scroll to discover
             </span>
-            <ScrollIcon />
+            <div className="text-zinc-400">
+              <ScrollIcon />
+            </div>
           </div>
         </div>
       </section>
