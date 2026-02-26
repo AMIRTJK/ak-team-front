@@ -20,9 +20,9 @@ export const Card = ({ title, titleDesc, desc, footerText, color }: IProps) => {
 						height={50}
 						className="transform -scale-x-100"
 					/>
-					<div className="ourwork__icon-text p-5">
-						<p className="card__text">{title || "-"}</p>
-						<p>{titleDesc || "-"}</p>
+					<div className="ourwork__icon-text flex flex-col gap-2 p-5">
+						<p className="card__text text-3xl font-bold">{title || "-"}</p>
+						<p className=" text-2xl">{titleDesc || "-"}</p>
 					</div>
 					<Image
 						src="/1.svg"
@@ -32,8 +32,8 @@ export const Card = ({ title, titleDesc, desc, footerText, color }: IProps) => {
 						className="text-white"
 					/>
 				</div>
-				<p className="ourwork__desc-text">{desc || "-"}</p>
-				<p className="ourwork__footer-text">{footerText || "-"}</p>
+				<p className="ourwork__desc-text text-[16px]">{desc || "-"}</p>
+				<p className="ourwork__footer-text text-[16px]">{footerText || "-"}</p>
 			</div>
 		</div>
 	);
