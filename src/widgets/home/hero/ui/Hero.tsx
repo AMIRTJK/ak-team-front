@@ -1,43 +1,36 @@
 "use client";
 
 import { useEffect, useRef, useMemo } from "react";
-import { Canvas, useThree } from "@react-three/fiber";
+import { Canvas, useThree, useFrame } from "@react-three/fiber";
 import { Float, Grid, Stars } from "@react-three/drei";
 import * as THREE from "three";
 import gsap from "gsap";
 import { ScrollIcon } from "@/shared/ui/Icons";
 import localFont from "next/font/local";
 
-// 1
+// Подключение шрифтов
 const aDLaMDisplayRegular = localFont({
   src: "../../../../../public/fonts/ADLaMDisplay-Regular.ttf",
   display: "swap",
 });
-
-// 2
 const audiowideRegular = localFont({
   src: "../../../../../public/fonts/Audiowide-Regular.ttf",
   display: "swap",
 });
-
-// 3
 const federoRegular = localFont({
   src: "../../../../../public/fonts/Federo-Regular.ttf",
   display: "swap",
 });
-
-// 4
 const gurajadaRegular = localFont({
   src: "../../../../../public/fonts/Gurajada-Regular.ttf",
   display: "swap",
 });
-
-// 5
 const megrimRegular = localFont({
   src: "../../../../../public/fonts/Megrim-Regular.ttf",
   display: "swap",
 });
 
+// --- УПРАВЛЕНИЕ КАМЕРОЙ ---
 const CameraRig = () => {
   const { camera } = useThree();
 
@@ -75,6 +68,147 @@ const CameraRig = () => {
   return null;
 };
 
+// ==========================================
+// 🚀 3D ЧАСТИЦЫ ТЕКСТА (ТОЛЬКО ДЛЯ ТЕМЫ КОСМОС)
+// ==========================================
+const ParticleText = ({ visible }: { visible: boolean }) => {
+  const { viewport, pointer } = useThree();
+  const materialRef = useRef<THREE.ShaderMaterial>(null);
+
+  const targetMouse = useRef(new THREE.Vector2(0, 0));
+  const currentMouse = useRef(new THREE.Vector2(0, 0));
+
+  const { positions, randoms } = useMemo(() => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 1024;
+    canvas.height = 256;
+    const ctx = canvas.getContext("2d");
+
+    if (ctx) {
+      ctx.fillStyle = "black";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.font = "900 140px sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "white";
+      ctx.fillText("A&K TEAM", canvas.width / 2, canvas.height / 2);
+
+      const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+      const posArray = [];
+      const rndArray = [];
+
+      for (let y = 0; y < canvas.height; y += 3) {
+        for (let x = 0; x < canvas.width; x += 3) {
+          const index = (x + y * canvas.width) * 4;
+          if (imgData[index] > 128) {
+            const pX = (x - canvas.width / 2) * 0.012;
+            const pY = -(y - canvas.height / 2) * 0.012;
+            posArray.push(pX, pY, 0);
+            rndArray.push(Math.random());
+          }
+        }
+      }
+      return {
+        positions: new Float32Array(posArray),
+        randoms: new Float32Array(rndArray),
+      };
+    }
+    return { positions: new Float32Array(), randoms: new Float32Array() };
+  }, []);
+
+  const uniforms = useMemo(
+    () => ({
+      uMouse: { value: new THREE.Vector2(0, 0) },
+      uTime: { value: 0 },
+      uColor: { value: new THREE.Color("#ffffff") },
+    }),
+    [],
+  );
+
+  useFrame((state) => {
+    if (!materialRef.current) return;
+    targetMouse.current.x = pointer.x * (viewport.width / 2);
+    targetMouse.current.y = pointer.y * (viewport.height / 2);
+    currentMouse.current.lerp(targetMouse.current, 0.1);
+
+    materialRef.current.uniforms.uMouse.value.copy(currentMouse.current);
+    materialRef.current.uniforms.uTime.value = state.clock.elapsedTime;
+  });
+
+  const scale = Math.min(1, viewport.width / 12);
+
+  return (
+    <points scale={scale} position={[0, 0, 1]} visible={visible}>
+      <bufferGeometry>
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
+        <bufferAttribute attach="attributes-aRandom" args={[randoms, 1]} />
+      </bufferGeometry>
+      <shaderMaterial
+        ref={materialRef}
+        uniforms={uniforms}
+        transparent
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
+        vertexShader={`
+          uniform vec2 uMouse;
+          uniform float uTime;
+          attribute float aRandom;
+          varying float vAlpha;
+
+          void main() {
+            vec3 pos = position;
+            
+            // Расстояние до мыши
+            float dist = distance(pos.xy, uMouse);
+            // Адекватный радиус отталкивания
+            float radius = 1.5; 
+            
+            // ВОЗВРАЩЕНО СТАРОЕ ПОВЕДЕНИЕ (РАЗЛЕТ ЧАСТИЦ)
+            if (dist < radius) {
+              float force = pow((radius - dist) / radius, 1.5);
+              vec2 dir = pos.xy - uMouse;
+              if (length(dir) > 0.0) {
+                dir = normalize(dir);
+              } else {
+                dir = vec2(aRandom, aRandom);
+              }
+              
+              // Частицы разлетаются в стороны и выпрыгивают вперед
+              pos.xy += dir * force * 1.5 * aRandom;
+              pos.z += force * 2.0 * aRandom;
+            }
+
+            // Фоновое плавное "дыхание" частиц
+            pos.x += sin(uTime * 1.0 + aRandom * 10.0) * 0.02;
+            pos.y += cos(uTime * 1.0 + aRandom * 10.0) * 0.02;
+
+            vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+            
+            // Размер точек
+            gl_PointSize = (4.0 * aRandom + 1.5) * (5.0 / -mvPosition.z);
+            gl_Position = projectionMatrix * mvPosition;
+            
+            // Прозрачность: частицы гаснут, когда выпрыгивают далеко вперед
+            vAlpha = 1.0 - clamp(pos.z * 0.5, 0.0, 1.0);
+          }
+        `}
+        fragmentShader={`
+          uniform vec3 uColor;
+          varying float vAlpha;
+          void main() {
+            vec2 center = gl_PointCoord - vec2(0.5);
+            if (length(center) > 0.5) discard;
+            float alpha = smoothstep(0.5, 0.2, length(center)) * vAlpha;
+            gl_FragColor = vec4(uColor, alpha);
+          }
+        `}
+      />
+    </points>
+  );
+};
+
+// --- ТЕМЫ ФОНА ---
 const ThemeStones = () => {
   const particles = useMemo(
     () =>
@@ -90,7 +224,6 @@ const ThemeStones = () => {
       })),
     [],
   );
-
   return (
     <>
       <fog attach="fog" args={["#111111", 5, 15]} />
@@ -136,7 +269,6 @@ const ThemeCyber = () => {
       })),
     [],
   );
-
   return (
     <>
       <fog attach="fog" args={["#0A0A0A", 5, 20]} />
@@ -201,7 +333,6 @@ const ThemeSpace = () => {
       })),
     [],
   );
-
   return (
     <>
       <fog attach="fog" args={["#000000", 10, 30]} />
@@ -231,6 +362,7 @@ const ThemeSpace = () => {
   );
 };
 
+// --- ОСНОВНОЙ КОМПОНЕНТ HERO ---
 export const Hero = ({
   theme = "cyber",
 }: {
@@ -280,48 +412,71 @@ export const Hero = ({
     <div
       className={`relative w-full h-[100svh] overflow-hidden transition-colors duration-1000 ${bgColors[theme]}`}
     >
+      {/* 3D Сцена */}
       <div className="absolute inset-0 z-0">
         <Canvas camera={{ position: [0, 0, 5], fov: 60 }}>
           <CameraRig />
           {theme === "stones" && <ThemeStones />}
           {theme === "cyber" && <ThemeCyber />}
           {theme === "space" && <ThemeSpace />}
+
+          {/* Частицы */}
+          <ParticleText visible={theme === "space"} />
         </Canvas>
       </div>
 
       <section className="relative z-10 w-full h-full flex flex-col justify-between pt-28 pb-8 md:pt-32 md:pb-10 pointer-events-none">
+        {/* КОНТЕЙНЕР ТЕКСТА (Здесь живет курсор/эффекты) */}
         <div className="flex-1 flex items-center justify-center w-full">
           <div
             ref={titleContainerRef}
-            className="relative will-change-transform flex items-center justify-center text-center select-none"
+            className="relative will-change-transform flex items-center justify-center text-center select-none w-full h-full"
             style={
-              {
-                "--mouse-x": "50%",
-                "--mouse-y": "50%",
-              } as React.CSSProperties
+              { "--mouse-x": "50%", "--mouse-y": "50%" } as React.CSSProperties
             }
           >
-            <h1
-              className={`text-white/50 text-[20vw] md:text-[14vw] font-[900] tracking-[-0.04em] leading-[0.8] uppercase flex flex-col md:flex-row items-center ${megrimRegular.className}`}
+            {/* ЕСЛИ ТЕМА КАМНИ/КИБЕР: Показываем эффект фонарика */}
+            <div
+              className={`absolute inset-0 flex items-center justify-center transition-opacity duration-500 ${theme === "space" ? "opacity-0" : "opacity-100"}`}
             >
-              A&K TEAM
-            </h1>
+              <h1
+                className={`text-white/50 text-[20vw] md:text-[14vw] font-[900] tracking-[-0.04em] leading-[0.8] uppercase flex flex-col md:flex-row items-center ${megrimRegular.className}`}
+              >
+                A&K TEAM
+              </h1>
+              <h1
+                aria-hidden="true"
+                className={`absolute inset-0 pointer-events-none text-transparent bg-clip-text text-[20vw] md:text-[14vw] font-[900] tracking-[-0.04em] leading-[0.8] uppercase flex items-center justify-center ${megrimRegular.className}`}
+                style={{
+                  backgroundImage:
+                    "radial-gradient(circle 25vw at var(--mouse-x) var(--mouse-y), rgba(255,255,255,1) 0%, rgba(255,255,255,0) 60%)",
+                  WebkitBackgroundClip: "text",
+                  backgroundClip: "text",
+                }}
+              >
+                A&K TEAM
+              </h1>
+            </div>
 
-            <h1
-              aria-hidden="true"
-              className={`absolute inset-0 pointer-events-none text-transparent bg-clip-text text-[20vw] md:text-[14vw] font-[900] tracking-[-0.04em] leading-[0.8] uppercase flex flex-col md:flex-row items-center ${megrimRegular.className}`}
+            {/* ВИЗУАЛЬНАЯ ЧЕРНАЯ ДЫРА ДЛЯ КУРСОРА (ТОЛЬКО В КОСМОСЕ) */}
+            <div
+              className={`absolute inset-0 pointer-events-none transition-opacity duration-500 ${theme === "space" ? "opacity-100" : "opacity-0"}`}
               style={{
-                backgroundImage:
-                  "radial-gradient(circle 25vw at var(--mouse-x) var(--mouse-y), rgba(255,255,255,1) 0%, rgba(255,255,255,0) 60%)",
-                WebkitBackgroundClip: "text",
-                backgroundClip: "text",
+                // Черное ядро в центре курсора с фиолетовым свечением по краям (аккреционный диск)
+                background:
+                  "radial-gradient(circle 8vw at var(--mouse-x) var(--mouse-y), rgba(0,0,0,1) 15%, rgba(60,20,120,0.5) 30%, transparent 60%)",
+                mixBlendMode: "normal", // Чтобы черная дыра перекрывала звезды
               }}
-            >
+            />
+
+            {/* Скрытый текст для Космоса (чтобы сохранить сетку) */}
+            <h1 className={`sr-only ${theme !== "space" ? "hidden" : "block"}`}>
               A&K TEAM
             </h1>
           </div>
         </div>
 
+        {/* НИЖНИЙ ИНТЕРФЕЙС */}
         <div className="relative w-full px-6 md:px-12 flex flex-col md:flex-row justify-between items-start md:items-end gap-10 md:gap-0 h-auto">
           <div className="max-w-full md:max-w-sm lg:max-w-md w-full relative pointer-events-auto">
             <p className="text-[#D24A43] text-[10px] md:text-xs font-bold tracking-[0.2em] mb-2 md:mb-4 uppercase">
