@@ -4,7 +4,14 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { LogoIcon } from "@/shared/ui/Icons";
 
+import localFont from "next/font/local";
+
 const NAV_LINKS = ["Services", "Projects", "Team", "Blog", "FAQ", "Contact"];
+
+const megrimRegular = localFont({
+  src: "../../../../../public/fonts/Megrim-Regular.ttf",
+  display: "swap",
+});
 
 export const Header = () => {
   const [activeSection, setActiveSection] = useState("home");
@@ -75,7 +82,9 @@ export const Header = () => {
           onClick={scrollToTop}
           className="relative z-[60] flex items-center gap-3 group"
         >
-          <div className="flex h-8 w-10 items-center justify-center rounded-lg border-2 border-[#E4D4C0] text-[#E4D4C0] font-black text-xs transition-colors duration-300 group-hover:bg-[#E4D4C0] group-hover:text-[#1A1918]">
+          <div
+            className={`flex h-8 w-10 items-center justify-center bg-[#E4D4C0] rounded-lg  text-[#1A1918] font-black text-base ${megrimRegular.className}`}
+          >
             A&K
           </div>
         </Link>

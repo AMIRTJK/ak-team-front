@@ -6,6 +6,37 @@ import { Float, Grid, Stars } from "@react-three/drei";
 import * as THREE from "three";
 import gsap from "gsap";
 import { ScrollIcon } from "@/shared/ui/Icons";
+import localFont from "next/font/local";
+
+// 1
+const aDLaMDisplayRegular = localFont({
+  src: "../../../../../public/fonts/ADLaMDisplay-Regular.ttf",
+  display: "swap",
+});
+
+// 2
+const audiowideRegular = localFont({
+  src: "../../../../../public/fonts/Audiowide-Regular.ttf",
+  display: "swap",
+});
+
+// 3
+const federoRegular = localFont({
+  src: "../../../../../public/fonts/Federo-Regular.ttf",
+  display: "swap",
+});
+
+// 4
+const gurajadaRegular = localFont({
+  src: "../../../../../public/fonts/Gurajada-Regular.ttf",
+  display: "swap",
+});
+
+// 5
+const megrimRegular = localFont({
+  src: "../../../../../public/fonts/Megrim-Regular.ttf",
+  display: "swap",
+});
 
 // 1. Управление камерой (остается неизменным)
 const CameraRig = () => {
@@ -262,7 +293,7 @@ export const Hero = ({
         <div className="flex-1 flex items-center justify-center w-full">
           <h1
             ref={titleRef}
-            className="text-[#EAE4D3] text-[24vw] md:text-[12vw] font-black tracking-tighter leading-[0.85] md:leading-none select-none flex flex-col md:flex-row items-center md:gap-4 text-center mix-blend-difference will-change-transform"
+            className={`text-[#EAE4D3] text-[20vw] md:text-[14vw] font-[900] tracking-[-0.04em] leading-[0.8] select-none flex flex-col md:flex-row items-center text-center mix-blend-difference will-change-transform uppercase ${megrimRegular.className}`}
           >
             A&K TEAM
           </h1>
