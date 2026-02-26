@@ -8,7 +8,7 @@ import { ThemeSwitcher, Theme } from "@/features/theme-switcher";
 import { LanguageSwitcher } from "@/features/language-switcher";
 
 export const Home = () => {
-  const [activeTheme, setActiveTheme] = useState<Theme>("cyber");
+  const [activeTheme, setActiveTheme] = useState<Theme>("stones");
 
   return (
     <div className="fullscreen relative">

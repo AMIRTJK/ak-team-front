@@ -233,8 +233,10 @@ export const Hero = ({
     const handleMouseMove = (e: MouseEvent) => {
       const x = (e.clientX / window.innerWidth) * 2 - 1;
       const y = (e.clientY / window.innerHeight) * 2 - 1;
-      xTo(Math.pow(x, 3) * 50);
-      yTo(Math.pow(y, 3) * 25);
+
+      // УМЕНЬШИЛИ МНОЖИТЕЛИ: было 50 и 25, стало 25 и 12.5
+      xTo(Math.pow(x, 3) * 25);
+      yTo(Math.pow(y, 3) * 12.5);
     };
 
     window.addEventListener("mousemove", handleMouseMove);
