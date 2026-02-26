@@ -1,5 +1,5 @@
-import { HomePage } from "@/pages/home/ui/HomePage";
+import { MainPage } from "@/pages/main/ui/MainPage";
 
-export default function Home() {
-  return <HomePage />;
+export default function Router() {
+  return <MainPage />;
 }
