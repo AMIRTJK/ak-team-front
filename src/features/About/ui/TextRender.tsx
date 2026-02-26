@@ -25,8 +25,8 @@ export const TextRender = () => {
 	return (
 		<div
 			ref={containerRef}
-			className="about__text-render"
-			style={{ margin: "30vh 0", position: "relative" }}
+			className="about__text-render h-[60vh]"
+			// style={{ margin: "20vh 0", position: "relative" }}
 		>
 			<p
 				style={{
