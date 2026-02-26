@@ -24,3 +24,13 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* SCROLLBAR */
+
+* {
+  scrollbar-width: none; /* Для Firefox */
+}
+
+*::-webkit-scrollbar {
+  display: none; /* Для Chrome, Safari, Edge, Opera */
+}
