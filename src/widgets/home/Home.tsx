@@ -1,14 +1,23 @@
-import { LanguageSwitcher } from "@/features/language-switcher/ui/LanguageSwitcher";
+"use client";
+
+import { useState } from "react";
 import { Header } from "./header/ui/Header";
 import { Hero } from "./hero/ui/Hero";
+import { ThemeSwitcher, Theme } from "@/features/theme-switcher";
 
+import { LanguageSwitcher } from "@/features/language-switcher";
 
 export const Home = () => {
+  const [activeTheme, setActiveTheme] = useState<Theme>("cyber");
+
   return (
-    <div className="fullscreen">
+    <div className="fullscreen relative">
       <LanguageSwitcher />
       <Header />
-      <Hero />
+
+      <Hero theme={activeTheme} />
+
+      <ThemeSwitcher activeTheme={activeTheme} onChangeTheme={setActiveTheme} />
     </div>
   );
 };
