@@ -7,20 +7,19 @@ export const LanguageSwitcher = () => {
   const [active, setActive] = useState<"RU" | "TJ">("RU");
 
   return (
-    // УБРАЛИ: fixed top-4 left-4 md:top-6 md:left-8 z-[70]
-    <div className="flex items-center bg-[#1C1A18] rounded-full p-0.5 md:p-1 border border-[#2E2B28] shadow-lg">
+    <div className="flex items-center bg-black/40 backdrop-blur-xl rounded-full p-1 border border-white/10 shadow-2xl">
       <button
         onClick={() => setActive("RU")}
-        className={`relative flex items-center justify-center cursor-pointer gap-1.5 px-3 py-1.5 md:gap-2.5 md:px-5 md:py-2 rounded-full text-[10px] md:text-xs font-black tracking-widest transition-colors duration-300 ${
+        className={`relative flex items-center justify-center cursor-pointer gap-1.5 px-3 py-1.5 md:gap-2.5 md:px-5 md:py-2 rounded-full text-[10px] md:text-xs font-semibold tracking-widest transition-colors duration-300 ${
           active === "RU"
-            ? "text-[#1A1816]"
-            : "text-[#6B655F] hover:text-[#E4D5C7]"
+            ? "text-black" 
+            : "text-zinc-400 hover:text-white" 
         }`}
       >
         {active === "RU" && (
           <motion.div
             layoutId="active-lang-bg"
-            className="absolute inset-0 bg-[#E4D5C7] rounded-full"
+            className="absolute inset-0 bg-white shadow-md rounded-full"
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
           />
         )}
@@ -35,16 +34,14 @@ export const LanguageSwitcher = () => {
 
       <button
         onClick={() => setActive("TJ")}
-        className={`relative flex items-center justify-center cursor-pointer gap-1.5 px-3 py-1.5 md:gap-2.5 md:px-5 md:py-2 rounded-full text-[10px] md:text-xs font-black tracking-widest transition-colors duration-300 ${
-          active === "TJ"
-            ? "text-[#1A1816]"
-            : "text-[#6B655F] hover:text-[#E4D5C7]"
+        className={`relative flex items-center justify-center cursor-pointer gap-1.5 px-3 py-1.5 md:gap-2.5 md:px-5 md:py-2 rounded-full text-[10px] md:text-xs font-semibold tracking-widest transition-colors duration-300 ${
+          active === "TJ" ? "text-black" : "text-zinc-400 hover:text-white"
         }`}
       >
         {active === "TJ" && (
           <motion.div
             layoutId="active-lang-bg"
-            className="absolute inset-0 bg-[#E4D5C7] rounded-full"
+            className="absolute inset-0 bg-white shadow-md rounded-full"
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
           />
         )}
