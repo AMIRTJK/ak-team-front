@@ -1,6 +1,7 @@
 "use client";
 
-// Экспортируем тип, чтобы использовать его в Home и Hero
+import { motion } from "framer-motion";
+
 export type Theme = "stones" | "cyber" | "space";
 
 interface ThemeSwitcherProps {
@@ -15,22 +16,27 @@ export const ThemeSwitcher = ({
   const themes: Theme[] = ["stones", "cyber", "space"];
 
   return (
-    <div className="absolute top-1/2 left-6 md:left-12 -translate-y-1/2 flex flex-col gap-3 z-50">
-      <p className="text-[#888888] text-[10px] font-bold tracking-[0.2em] uppercase mb-2">
-        Select Theme
-      </p>
-
+    // УБРАЛИ: fixed top-16 left-4 md:top-20 md:left-8 z-[70]
+    <div className="flex items-center bg-[#1C1A18] rounded-full p-0.5 md:p-1 border border-[#2E2B28] shadow-lg">
       {themes.map((theme) => (
         <button
           key={theme}
           onClick={() => onChangeTheme(theme)}
-          className={`px-4 py-2 text-xs cursor-pointer font-bold tracking-wider uppercase border transition-all duration-300 ${
+          className={`relative flex items-center justify-center cursor-pointer px-3 py-1.5 md:px-5 md:py-2 rounded-full text-[10px] md:text-xs font-bold tracking-widest transition-colors duration-300 ${
             activeTheme === theme
-              ? "border-[#D24A43] text-[#D24A43] bg-[#D24A43]/10"
-              : "border-[#444444] text-[#888888] hover:border-[#EAE4D3] hover:text-[#EAE4D3]"
+              ? "text-[#1A1816]"
+              : "text-[#6B655F] hover:text-[#E4D5C7]"
           }`}
         >
-          {theme}
+          {activeTheme === theme && (
+            <motion.div
+              layoutId="active-theme-bg"
+              className="absolute inset-0 bg-[#E4D5C7] rounded-full"
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            />
+          )}
+
+          <span className="relative z-10 uppercase">{theme}</span>
         </button>
       ))}
     </div>
