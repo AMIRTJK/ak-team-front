@@ -301,14 +301,12 @@ export const Hero = ({
               } as React.CSSProperties
             }
           >
-            {/* ИЗМЕНЕНИЕ 1: Базовый текст теперь светлее (text-white/40). Он отлично читается всегда. */}
             <h1
               className={`text-white/50 text-[20vw] md:text-[14vw] font-[900] tracking-[-0.04em] leading-[0.8] uppercase flex flex-col md:flex-row items-center ${megrimRegular.className}`}
             >
               A&K TEAM
             </h1>
 
-            {/* ИЗМЕНЕНИЕ 2: Фонарик стал мягче и шире, чтобы просто создавать красивый блик на светлом фоне */}
             <h1
               aria-hidden="true"
               className={`absolute inset-0 pointer-events-none text-transparent bg-clip-text text-[20vw] md:text-[14vw] font-[900] tracking-[-0.04em] leading-[0.8] uppercase flex flex-col md:flex-row items-center ${megrimRegular.className}`}
