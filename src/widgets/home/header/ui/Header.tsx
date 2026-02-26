@@ -89,7 +89,7 @@ export const Header = () => {
           </div>
         </Link>
 
-        <div className="relative z-10 hidden items-center gap-1 border-l-2 border-[#E4D4C0]/30 pl-3 md:flex">
+        <div className="relative z-10 hidden items-center gap-3 border-l-2 border-[#E4D4C0]/30 pl-3 md:flex">
           <NavLink
             label="Home"
             isActive={activeSection === "home"}
