@@ -236,7 +236,7 @@ export const Hero = ({
 }: {
   theme?: "stones" | "cyber" | "space";
 }) => {
-  const titleRef = useRef<HTMLHeadingElement>(null);
+  const titleContainerRef = useRef<HTMLDivElement>(null);
 
   const bgColors = {
     stones: "bg-[#111111]",
@@ -245,12 +245,13 @@ export const Hero = ({
   };
 
   useEffect(() => {
-    if (!titleRef.current) return;
-    const xTo = gsap.quickTo(titleRef.current, "x", {
+    if (!titleContainerRef.current) return;
+
+    const xTo = gsap.quickTo(titleContainerRef.current, "x", {
       duration: 1.5,
       ease: "power3.out",
     });
-    const yTo = gsap.quickTo(titleRef.current, "y", {
+    const yTo = gsap.quickTo(titleContainerRef.current, "y", {
       duration: 1.5,
       ease: "power3.out",
     });
@@ -258,9 +259,17 @@ export const Hero = ({
     const handleMouseMove = (e: MouseEvent) => {
       const x = (e.clientX / window.innerWidth) * 2 - 1;
       const y = (e.clientY / window.innerHeight) * 2 - 1;
-
       xTo(Math.pow(x, 3) * 25);
       yTo(Math.pow(y, 3) * 12.5);
+
+      if (titleContainerRef.current) {
+        const rect = titleContainerRef.current.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+
+        titleContainerRef.current.style.setProperty("--mouse-x", `${mouseX}px`);
+        titleContainerRef.current.style.setProperty("--mouse-y", `${mouseY}px`);
+      }
     };
 
     window.addEventListener("mousemove", handleMouseMove);
@@ -282,12 +291,35 @@ export const Hero = ({
 
       <section className="relative z-10 w-full h-full flex flex-col justify-between pt-28 pb-8 md:pt-32 md:pb-10 pointer-events-none">
         <div className="flex-1 flex items-center justify-center w-full">
-          <h1
-            ref={titleRef}
-            className={`text-white text-[20vw] md:text-[14vw] font-[900] tracking-[-0.04em] leading-[0.8] select-none flex flex-col md:flex-row items-center text-center mix-blend-difference will-change-transform uppercase ${megrimRegular.className}`}
+          <div
+            ref={titleContainerRef}
+            className="relative will-change-transform flex items-center justify-center text-center select-none"
+            style={
+              {
+                "--mouse-x": "50%",
+                "--mouse-y": "50%",
+              } as React.CSSProperties
+            }
           >
-            A&K TEAM
-          </h1>
+            <h1
+              className={`text-white/50 text-[20vw] md:text-[14vw] font-[900] tracking-[-0.04em] leading-[0.8] uppercase flex flex-col md:flex-row items-center ${megrimRegular.className}`}
+            >
+              A&K TEAM
+            </h1>
+
+            <h1
+              aria-hidden="true"
+              className={`absolute inset-0 pointer-events-none text-transparent bg-clip-text text-[20vw] md:text-[14vw] font-[900] tracking-[-0.04em] leading-[0.8] uppercase flex flex-col md:flex-row items-center ${megrimRegular.className}`}
+              style={{
+                backgroundImage:
+                  "radial-gradient(circle 25vw at var(--mouse-x) var(--mouse-y), rgba(255,255,255,1) 0%, rgba(255,255,255,0) 60%)",
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text",
+              }}
+            >
+              A&K TEAM
+            </h1>
+          </div>
         </div>
 
         <div className="relative w-full px-6 md:px-12 flex flex-col md:flex-row justify-between items-start md:items-end gap-10 md:gap-0 h-auto">
