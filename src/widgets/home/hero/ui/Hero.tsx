@@ -293,7 +293,7 @@ const MagneticCyberText = ({
     lettersRef.current.forEach((el, i) => {
       if (el) {
         gsap.to(el, {
-          y: "-=15",
+          y: "-=10", // Чуть уменьшил базовую левитацию для аккуратности
           yoyo: true,
           repeat: -1,
           duration: 1.5 + Math.random(),
@@ -318,12 +318,21 @@ const MagneticCyberText = ({
 
         if (distance < 200) {
           gsap.to(inner, {
-            x: distX * 0.4,
-            y: distY * 0.4,
-            rotationZ: distX * 0.05,
-            scale: 1.2,
+            x: distX * 0.3, // Мягче тянется
+            y: distY * 0.3,
+            // Незаметный 3D-поворот вслед за мышкой
+            rotationX: -distY * 0.15,
+            rotationY: distX * 0.15,
+            rotationZ: distX * 0.01,
+            scale: 1.15,
+            transformPerspective: 500, // Включаем 3D-перспективу для поворотов
             color: "#D24A43",
-            textShadow: "0px 0px 20px rgba(210, 74, 67, 0.8)",
+            // Многослойная деталь: темная тень (объем) + два слоя красного (LED-неон)
+            textShadow: `
+              0px 10px 15px rgba(0, 0, 0, 0.6), 
+              0px 0px 12px rgba(210, 74, 67, 0.8), 
+              0px 0px 25px rgba(210, 74, 67, 0.4)
+            `,
             duration: 0.3,
             ease: "power2.out",
             overwrite: "auto",
@@ -332,12 +341,15 @@ const MagneticCyberText = ({
           gsap.to(inner, {
             x: 0,
             y: 0,
+            rotationX: 0,
+            rotationY: 0,
             rotationZ: 0,
             scale: 1,
-            color: "#d1d5db",
-            textShadow: "0px 0px 0px rgba(210, 74, 67, 0)",
+            color: "#d1d5db", // Возврат к серебряному
+            textShadow:
+              "0px 0px 0px rgba(0,0,0,0), 0px 0px 0px rgba(210,74,67,0), 0px 0px 0px rgba(210,74,67,0)",
             duration: 0.8,
-            ease: "elastic.out(1, 0.4)",
+            ease: "elastic.out(1, 0.5)", // Мягко "пружинит" обратно
             overwrite: "auto",
           });
         }
@@ -351,6 +363,7 @@ const MagneticCyberText = ({
   return (
     <h1
       className={`text-[20vw] md:text-[14vw] font-[900] tracking-[-0.04em] leading-[0.8] uppercase flex items-center justify-center pointer-events-auto ${fontClass}`}
+      style={{ perspective: "800px" }} // Глобальная перспектива для контейнера
     >
       {text.split("").map((char, i) => (
         <span
@@ -361,7 +374,11 @@ const MagneticCyberText = ({
           className="inline-block"
           style={{ width: char === " " ? "4vw" : "auto" }}
         >
-          <span className="magnetic-inner inline-block transition-colors duration-200 will-change-transform text-[#d1d5db]">
+          {/* transform-style-preserve-3d позволяет внутреннему спану корректно вращаться в 3D */}
+          <span
+            className="magnetic-inner inline-block transition-colors duration-200 will-change-transform text-[#d1d5db]"
+            style={{ transformStyle: "preserve-3d" }}
+          >
             {char}
           </span>
         </span>
