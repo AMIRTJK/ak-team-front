@@ -10,7 +10,6 @@ export const Header = () => {
   const [activeSection, setActiveSection] = useState("home");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // Блокируем скролл страницы, когда открыто мобильное меню
   useEffect(() => {
     if (isMenuOpen) {
       document.body.style.overflow = "hidden";
@@ -19,7 +18,7 @@ export const Header = () => {
     }
   }, [isMenuOpen]);
 
-  const handleScroll = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+  const handleScroll = (e: React.MouseEvent<HTMLElement>, id: string) => {
     e.preventDefault();
     setActiveSection(id);
     setIsMenuOpen(false);
@@ -29,7 +28,7 @@ export const Header = () => {
     }
   };
 
-  const scrollToTop = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const scrollToTop = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
     setActiveSection("home");
     setIsMenuOpen(false);
@@ -37,10 +36,7 @@ export const Header = () => {
   };
 
   return (
-    // 1. Контейнер теперь на всю ширину (w-full), центрирует содержимое через flex, z-index повышен до 100
-    // pointer-events-none нужен, чтобы клики проходили сквозь пустые области хедера
     <header className="fixed top-16 md:top-6 left-0 w-full z-[100] flex justify-center pointer-events-none">
-      {/* 2. Темный фон мобильного меню (Overlay). Вынесен ИЗ <nav>, чтобы растягиваться на 100% экрана */}
       <div
         className={`fixed inset-0 w-screen h-[100dvh] bg-[#11100F] transition-opacity duration-300 md:hidden flex flex-col items-center justify-center pointer-events-auto ${
           isMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
@@ -73,9 +69,7 @@ export const Header = () => {
         </div>
       </div>
 
-      {/* 3. Само меню (плашка). relative и z-50 оставляют его поверх темного фона */}
       <nav className="pointer-events-auto relative z-50 flex items-center justify-between gap-4 rounded-full bg-white/10 px-4 py-2 backdrop-blur-md transition-all lg:gap-3 lg:px-3 lg:py-1.5 2xl:gap-4 2xl:px-4 2xl:py-2 border border-white/10 w-[95%] max-w-fit">
-        {/* Logo Area */}
         <Link
           href="/"
           onClick={scrollToTop}
@@ -87,7 +81,6 @@ export const Header = () => {
           </span>
         </Link>
 
-        {/* Desktop Navigation */}
         <div className="relative z-10 hidden items-center gap-1 border-l-2 border-[#E4D4C0]/30 pl-8 md:flex lg:pl-6 2xl:pl-8">
           <NavLink
             label="Home"
@@ -104,7 +97,6 @@ export const Header = () => {
           ))}
         </div>
 
-        {/* Mobile Menu Button */}
         <button
           onClick={() => setIsMenuOpen(!isMenuOpen)}
           className="relative z-[60] flex h-10 w-10 items-center justify-center text-[#E4D4C0] md:hidden"
@@ -127,7 +119,6 @@ export const Header = () => {
   );
 };
 
-// Вспомогательный компонент для ссылок (Desktop)
 const NavLink = ({
   label,
   isActive,
