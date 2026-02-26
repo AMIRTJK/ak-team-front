@@ -5,8 +5,7 @@ export const Hero = () => {
     <section className="relative w-full min-h-[100svh] flex flex-col justify-between pt-28 pb-8 md:pt-32 md:pb-10">
       <div className="flex-1 flex items-center justify-center w-full">
         <h1 className="text-[#EAE4D3] text-[24vw] md:text-[12vw] font-black tracking-tighter leading-[0.85] md:leading-none select-none flex flex-col md:flex-row items-center md:gap-4 text-center">
-          <span>A&K</span>
-          <span>TEAM</span>
+          A&K TEAM
         </h1>
       </div>
 
