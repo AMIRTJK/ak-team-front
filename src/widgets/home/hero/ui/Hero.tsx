@@ -8,7 +8,7 @@ import gsap from "gsap";
 import { ScrollIcon } from "@/shared/ui/Icons";
 import localFont from "next/font/local";
 
-// Подключение шрифтов
+// Подключение шрифтов (убедитесь, что пути правильные)
 const aDLaMDisplayRegular = localFont({
   src: "../../../../../public/fonts/ADLaMDisplay-Regular.ttf",
   display: "swap",
@@ -158,38 +158,23 @@ const ParticleText = ({ visible }: { visible: boolean }) => {
 
           void main() {
             vec3 pos = position;
-            
-            // Расстояние до мыши
             float dist = distance(pos.xy, uMouse);
-            // Адекватный радиус отталкивания
             float radius = 1.5; 
             
-            // ВОЗВРАЩЕНО СТАРОЕ ПОВЕДЕНИЕ (РАЗЛЕТ ЧАСТИЦ)
             if (dist < radius) {
               float force = pow((radius - dist) / radius, 1.5);
               vec2 dir = pos.xy - uMouse;
-              if (length(dir) > 0.0) {
-                dir = normalize(dir);
-              } else {
-                dir = vec2(aRandom, aRandom);
-              }
-              
-              // Частицы разлетаются в стороны и выпрыгивают вперед
+              if (length(dir) > 0.0) { dir = normalize(dir); } else { dir = vec2(aRandom, aRandom); }
               pos.xy += dir * force * 1.5 * aRandom;
               pos.z += force * 2.0 * aRandom;
             }
 
-            // Фоновое плавное "дыхание" частиц
             pos.x += sin(uTime * 1.0 + aRandom * 10.0) * 0.02;
             pos.y += cos(uTime * 1.0 + aRandom * 10.0) * 0.02;
 
             vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
-            
-            // Размер точек
             gl_PointSize = (4.0 * aRandom + 1.5) * (5.0 / -mvPosition.z);
             gl_Position = projectionMatrix * mvPosition;
-            
-            // Прозрачность: частицы гаснут, когда выпрыгивают далеко вперед
             vAlpha = 1.0 - clamp(pos.z * 0.5, 0.0, 1.0);
           }
         `}
@@ -208,20 +193,126 @@ const ParticleText = ({ visible }: { visible: boolean }) => {
   );
 };
 
+// ==========================================
+// 🧲 ВАРИАНТ 3: МАГНИТНЫЙ ТЕКСТ ДЛЯ CYBER
+// ==========================================
+const MagneticCyberText = ({
+  text,
+  fontClass,
+}: {
+  text: string;
+  fontClass: string;
+}) => {
+  const lettersRef = useRef<(HTMLSpanElement | null)[]>([]);
+
+  useEffect(() => {
+    // 1. Анимация постоянного "парения" (левитации) букв
+    lettersRef.current.forEach((el, i) => {
+      if (el) {
+        gsap.to(el, {
+          y: "-=15",
+          yoyo: true,
+          repeat: -1,
+          duration: 1.5 + Math.random(),
+          ease: "sine.inOut",
+          delay: i * 0.1,
+        });
+      }
+    });
+
+    // 2. Магнитный эффект при движении мыши
+    const handleMouseMove = (e: MouseEvent) => {
+      lettersRef.current.forEach((el) => {
+        if (!el) return;
+        const inner = el.querySelector(".magnetic-inner") as HTMLElement;
+        if (!inner) return;
+
+        const rect = el.getBoundingClientRect();
+        // Находим центр каждой буквы
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+
+        // Дистанция от курсора до буквы
+        const distX = e.clientX - centerX;
+        const distY = e.clientY - centerY;
+        const distance = Math.sqrt(distX * distX + distY * distY);
+
+        const magnetRadius = 200; // Радиус захвата
+
+        if (distance < magnetRadius) {
+          // Притягиваем букву к курсору
+          gsap.to(inner, {
+            x: distX * 0.4,
+            y: distY * 0.4,
+            rotationZ: distX * 0.05, // Легкий наклон для кибер-эффекта
+            scale: 1.2,
+            color: "#D24A43", // Кибер-красный
+            textShadow: "0px 0px 20px rgba(210, 74, 67, 0.8)",
+            duration: 0.3,
+            ease: "power2.out",
+            overwrite: "auto",
+          });
+        } else {
+          // Возвращаем на место с эффектом "пружины"
+          gsap.to(inner, {
+            x: 0,
+            y: 0,
+            rotationZ: 0,
+            scale: 1,
+            color: "white",
+            textShadow: "0px 0px 0px rgba(210, 74, 67, 0)",
+            duration: 0.8,
+            ease: "elastic.out(1, 0.4)",
+            overwrite: "auto",
+          });
+        }
+      });
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
+
+  return (
+    <h1
+      className={`text-[20vw] md:text-[14vw] font-[900] tracking-[-0.04em] leading-[0.8] uppercase flex items-center justify-center ${fontClass}`}
+    >
+      {text.split("").map((char, i) => (
+        <span
+          key={i}
+          ref={(el) => {
+            lettersRef.current[i] = el;
+          }}
+          className="inline-block pointer-events-auto"
+          style={{ width: char === " " ? "4vw" : "auto" }} // Сохраняем пробелы
+        >
+          {/* Внутренний спан для магнита, внешний для левитации */}
+          <span className="magnetic-inner inline-block transition-colors duration-200 will-change-transform text-white">
+            {char}
+          </span>
+        </span>
+      ))}
+    </h1>
+  );
+};
+
 // --- ТЕМЫ ФОНА ---
 const ThemeStones = () => {
+  /* ... ваш существующий код ThemeStones ... */
   const particles = useMemo(
     () =>
-      new Array(60).fill(null).map(() => ({
-        position: [
-          (Math.random() - 0.5) * 30,
-          (Math.random() - 0.5) * 30,
-          (Math.random() - 0.5) * 20 - 5,
-        ],
-        rotation: [Math.random() * Math.PI, Math.random() * Math.PI, 0],
-        scale: Math.random() * 0.6 + 0.1,
-        color: Math.random() > 0.8 ? "#D24A43" : "#2A2A2A",
-      })),
+      new Array(60)
+        .fill(null)
+        .map(() => ({
+          position: [
+            (Math.random() - 0.5) * 30,
+            (Math.random() - 0.5) * 30,
+            (Math.random() - 0.5) * 20 - 5,
+          ],
+          rotation: [Math.random() * Math.PI, Math.random() * Math.PI, 0],
+          scale: Math.random() * 0.6 + 0.1,
+          color: Math.random() > 0.8 ? "#D24A43" : "#2A2A2A",
+        })),
     [],
   );
   return (
@@ -255,18 +346,21 @@ const ThemeStones = () => {
 };
 
 const ThemeCyber = () => {
+  /* ... ваш существующий код ThemeCyber ... */
   const particles = useMemo(
     () =>
-      new Array(60).fill(null).map(() => ({
-        position: [
-          (Math.random() - 0.5) * 30,
-          (Math.random() - 0.5) * 20,
-          (Math.random() - 0.5) * 20 - 5,
-        ],
-        rotation: [Math.random() * Math.PI, Math.random() * Math.PI, 0],
-        scale: Math.random() * 0.8 + 0.2,
-        color: Math.random() > 0.8 ? "#D24A43" : "#444444",
-      })),
+      new Array(60)
+        .fill(null)
+        .map(() => ({
+          position: [
+            (Math.random() - 0.5) * 30,
+            (Math.random() - 0.5) * 20,
+            (Math.random() - 0.5) * 20 - 5,
+          ],
+          rotation: [Math.random() * Math.PI, Math.random() * Math.PI, 0],
+          scale: Math.random() * 0.8 + 0.2,
+          color: Math.random() > 0.8 ? "#D24A43" : "#444444",
+        })),
     [],
   );
   return (
@@ -320,17 +414,20 @@ const ThemeCyber = () => {
 };
 
 const ThemeSpace = () => {
+  /* ... ваш существующий код ThemeSpace ... */
   const planets = useMemo(
     () =>
-      new Array(40).fill(null).map(() => ({
-        position: [
-          (Math.random() - 0.5) * 40,
-          (Math.random() - 0.5) * 40,
-          (Math.random() - 0.5) * 30 - 10,
-        ],
-        scale: Math.random() * 1.5 + 0.1,
-        color: Math.random() > 0.9 ? "#D24A43" : "#FFFFFF",
-      })),
+      new Array(40)
+        .fill(null)
+        .map(() => ({
+          position: [
+            (Math.random() - 0.5) * 40,
+            (Math.random() - 0.5) * 40,
+            (Math.random() - 0.5) * 30 - 10,
+          ],
+          scale: Math.random() * 1.5 + 0.1,
+          color: Math.random() > 0.9 ? "#D24A43" : "#FFFFFF",
+        })),
     [],
   );
   return (
@@ -391,6 +488,7 @@ export const Hero = ({
     const handleMouseMove = (e: MouseEvent) => {
       const x = (e.clientX / window.innerWidth) * 2 - 1;
       const y = (e.clientY / window.innerHeight) * 2 - 1;
+      // Легкий параллакс всего контейнера
       xTo(Math.pow(x, 3) * 25);
       yTo(Math.pow(y, 3) * 12.5);
 
@@ -398,7 +496,6 @@ export const Hero = ({
         const rect = titleContainerRef.current.getBoundingClientRect();
         const mouseX = e.clientX - rect.left;
         const mouseY = e.clientY - rect.top;
-
         titleContainerRef.current.style.setProperty("--mouse-x", `${mouseX}px`);
         titleContainerRef.current.style.setProperty("--mouse-y", `${mouseY}px`);
       }
@@ -413,7 +510,7 @@ export const Hero = ({
       className={`relative w-full h-[100svh] overflow-hidden transition-colors duration-1000 ${bgColors[theme]}`}
     >
       {/* 3D Сцена */}
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 z-0 pointer-events-none">
         <Canvas camera={{ position: [0, 0, 5], fov: 60 }}>
           <CameraRig />
           {theme === "stones" && <ThemeStones />}
@@ -426,7 +523,7 @@ export const Hero = ({
       </div>
 
       <section className="relative z-10 w-full h-full flex flex-col justify-between pt-28 pb-8 md:pt-32 md:pb-10 pointer-events-none">
-        {/* КОНТЕЙНЕР ТЕКСТА (Здесь живет курсор/эффекты) */}
+        {/* КОНТЕЙНЕР ТЕКСТА */}
         <div className="flex-1 flex items-center justify-center w-full">
           <div
             ref={titleContainerRef}
@@ -435,41 +532,52 @@ export const Hero = ({
               { "--mouse-x": "50%", "--mouse-y": "50%" } as React.CSSProperties
             }
           >
-            {/* ЕСЛИ ТЕМА КАМНИ/КИБЕР: Показываем эффект фонарика */}
-            <div
-              className={`absolute inset-0 flex items-center justify-center transition-opacity duration-500 ${theme === "space" ? "opacity-0" : "opacity-100"}`}
-            >
-              <h1
-                className={`text-white/50 text-[20vw] md:text-[14vw] font-[900] tracking-[-0.04em] leading-[0.8] uppercase flex flex-col md:flex-row items-center ${megrimRegular.className}`}
-              >
-                A&K TEAM
-              </h1>
-              <h1
-                aria-hidden="true"
-                className={`absolute inset-0 pointer-events-none text-transparent bg-clip-text text-[20vw] md:text-[14vw] font-[900] tracking-[-0.04em] leading-[0.8] uppercase flex items-center justify-center ${megrimRegular.className}`}
-                style={{
-                  backgroundImage:
-                    "radial-gradient(circle 25vw at var(--mouse-x) var(--mouse-y), rgba(255,255,255,1) 0%, rgba(255,255,255,0) 60%)",
-                  WebkitBackgroundClip: "text",
-                  backgroundClip: "text",
-                }}
-              >
-                A&K TEAM
-              </h1>
-            </div>
+            {/* ВАРИАНТ 1: КАМНИ (Эффект фонарика CSS) */}
+            {theme === "stones" && (
+              <div className="absolute inset-0 flex items-center justify-center transition-opacity duration-500">
+                <h1
+                  className={`text-white/50 text-[20vw] md:text-[14vw] font-[900] tracking-[-0.04em] leading-[0.8] uppercase flex flex-col md:flex-row items-center ${megrimRegular.className}`}
+                >
+                  A&K TEAM
+                </h1>
+                <h1
+                  aria-hidden="true"
+                  className={`absolute inset-0 pointer-events-none text-transparent bg-clip-text text-[20vw] md:text-[14vw] font-[900] tracking-[-0.04em] leading-[0.8] uppercase flex items-center justify-center ${megrimRegular.className}`}
+                  style={{
+                    backgroundImage:
+                      "radial-gradient(circle 25vw at var(--mouse-x) var(--mouse-y), rgba(255,255,255,1) 0%, rgba(255,255,255,0) 60%)",
+                    WebkitBackgroundClip: "text",
+                    backgroundClip: "text",
+                  }}
+                >
+                  A&K TEAM
+                </h1>
+              </div>
+            )}
+
+            {/* ВАРИАНТ 3: CYBER (Магнитные буквы GSAP) */}
+            {theme === "cyber" && (
+              <div className="absolute inset-0 flex items-center justify-center transition-opacity duration-500 z-50">
+                <MagneticCyberText
+                  text="A&K TEAM"
+                  fontClass={megrimRegular.className}
+                />
+              </div>
+            )}
 
             {/* ВИЗУАЛЬНАЯ ЧЕРНАЯ ДЫРА ДЛЯ КУРСОРА (ТОЛЬКО В КОСМОСЕ) */}
-            <div
-              className={`absolute inset-0 pointer-events-none transition-opacity duration-500 ${theme === "space" ? "opacity-100" : "opacity-0"}`}
-              style={{
-                // Черное ядро в центре курсора с фиолетовым свечением по краям (аккреционный диск)
-                background:
-                  "radial-gradient(circle 8vw at var(--mouse-x) var(--mouse-y), rgba(0,0,0,1) 15%, rgba(60,20,120,0.5) 30%, transparent 60%)",
-                mixBlendMode: "normal", // Чтобы черная дыра перекрывала звезды
-              }}
-            />
+            {theme === "space" && (
+              <div
+                className="absolute inset-0 pointer-events-none transition-opacity duration-500"
+                style={{
+                  background:
+                    "radial-gradient(circle 8vw at var(--mouse-x) var(--mouse-y), rgba(0,0,0,1) 15%, rgba(60,20,120,0.5) 30%, transparent 60%)",
+                  mixBlendMode: "normal",
+                }}
+              />
+            )}
 
-            {/* Скрытый текст для Космоса (чтобы сохранить сетку) */}
+            {/* Скрытый текст для Космоса (чтобы сохранить сетку контейнера) */}
             <h1 className={`sr-only ${theme !== "space" ? "hidden" : "block"}`}>
               A&K TEAM
             </h1>
