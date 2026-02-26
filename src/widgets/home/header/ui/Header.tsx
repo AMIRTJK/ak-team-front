@@ -105,7 +105,7 @@ export const Header = () => {
 
         <button
           onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="relative z-[60] flex h-10 w-10 items-center justify-center text-white md:hidden"
+          className="relative z-[60] flex h-10 w-10 items-center justify-center text-white md:hidden cursor-pointer"
           aria-label="Toggle menu"
         >
           <div className="relative flex h-5 w-6 flex-col justify-between">
