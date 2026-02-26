@@ -73,15 +73,14 @@ export const Header = () => {
         <Link
           href="/"
           onClick={scrollToTop}
-          className="relative z-[60] flex items-center gap-3 pr-3 lg:pr-2 2xl:pr-3"
+          className="relative z-[60] flex items-center gap-3 group"
         >
-          <LogoIcon />
-          <span className="text-[#E4D4C0] font-black text-xl tracking-widest mt-0.5">
-            GRAFFICO
-          </span>
+          <div className="flex h-8 w-10 items-center justify-center rounded-lg border-2 border-[#E4D4C0] text-[#E4D4C0] font-black text-xs transition-colors duration-300 group-hover:bg-[#E4D4C0] group-hover:text-[#1A1918]">
+            A&K
+          </div>
         </Link>
 
-        <div className="relative z-10 hidden items-center gap-1 border-l-2 border-[#E4D4C0]/30 pl-8 md:flex lg:pl-6 2xl:pl-8">
+        <div className="relative z-10 hidden items-center gap-1 border-l-2 border-[#E4D4C0]/30 pl-3 md:flex">
           <NavLink
             label="Home"
             isActive={activeSection === "home"}
