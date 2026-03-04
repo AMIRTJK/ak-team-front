@@ -2,7 +2,7 @@ import { Card } from "./ui/Card";
 
 export const OurWork = () => {
 	return (
-		<section className="w-full flex flex-col items-center">
+		<section className="w-full flex flex-col items-center p-15">
 			<div className="w-full flex flex-col items-center justify-center gap-4 text-center">
 				<h2 className="text-[#C8FF12] text-[clamp(64px,14vw,220px)] leading-[0.9]">
 					Our work

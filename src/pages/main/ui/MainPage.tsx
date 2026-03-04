@@ -6,19 +6,16 @@ import { Home } from "@/widgets/home";
 
 export default function MainPage() {
   return (
-    <main className="min-h-screen bg-[#161515] overflow-x-hidden relative font-sans flex flex-col gap-20">
+    <main className="min-h-screen bg-[#161515] overflow-x-hidden relative font-sans flex flex-col">
       <Home />
       <About />
       <ScrollIndicator />
       <OurWork />
 
-      {/* Изолируем GSAP от флексбокса с помощью обычного div */}
       <div className="block w-full">
         <GamepadShowcase />
       </div>
 
-      {/* Опционально: небольшой невидимый блок в самом конце гарантирует, 
-          что браузер точно отдаст весь скролл-контейнер до последнего пикселя */}
       <div className="h-10 w-full" />
     </main>
   );
