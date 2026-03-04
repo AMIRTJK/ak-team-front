@@ -77,7 +77,7 @@ export const GamepadShowcase = () => {
   return (
     <section
       ref={containerRef}
-      className="relative h-screen w-full flex items-center justify-center bg-[#161515]"
+      className="relative h-screen w-full flex items-center justify-center bg-[#030303]"
     >
       <canvas
         ref={canvasRef}

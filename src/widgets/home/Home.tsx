@@ -11,7 +11,7 @@ export const Home = () => {
   const [activeTheme, setActiveTheme] = useState<Theme>("stones");
 
   return (
-    <div className="fullscreen relative">
+    <div className="fullscreen relative ">
       <Header />
       <Hero theme={activeTheme} />
 
