@@ -37,7 +37,7 @@ export const ScrollIndicator = () => {
     const thumbY = (progress / 100) * (trackHeight - thumbHeight) + thumbHeight / 2;
 
     const startX = canvas.width / (typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1) / 2;
-    const startY = thumbY;
+    const startY = thumbY + 40; // Add 40px padding offset since canvas top is 40px above track top
 
     // Spawn sparks (3 particles per tick)
     const count = 3;
@@ -149,7 +149,7 @@ export const ScrollIndicator = () => {
       if (rect) {
         const dpr = window.devicePixelRatio || 1;
         const targetWidth = rect.width + 80;
-        const targetHeight = rect.height;
+        const targetHeight = rect.height + 80; // Add 80px extra vertical room
 
         if (canvas.width !== targetWidth * dpr) {
           canvas.width = targetWidth * dpr;
@@ -225,21 +225,21 @@ export const ScrollIndicator = () => {
       {/* Scroll track line */}
       <div className="absolute top-0 bottom-0 w-[1px] bg-[#D24A43] opacity-20 pointer-events-none" />
 
-      {/* Sparks canvas - absolutely positioned relative to the track container */}
+      {/* Sparks canvas - absolutely positioned and extended vertically to prevent clipping */}
       <canvas
         ref={canvasRef}
         className="absolute pointer-events-none select-none z-0"
         style={{
-          height: "100%",
+          height: "calc(100% + 80px)",
           left: "50%",
-          transform: "translateX(-50%)",
-          top: 0,
+          top: "50%",
+          transform: "translate(-50%, -50%)",
         }}
       />
 
-      {/* Red scrollbar thumb */}
+      {/* Red scrollbar thumb - glow shadow removed as requested */}
       <div
-        className="absolute w-1.5 md:w-2 h-6 md:h-8 bg-[#D24A43] rounded-full transition-transform duration-75 ease-out will-change-transform pointer-events-none z-10 shadow-[0_0_8px_rgba(210,74,67,0.7)]"
+        className="absolute w-1.5 md:w-2 h-6 md:h-8 bg-[#D24A43] rounded-full transition-transform duration-75 ease-out will-change-transform pointer-events-none z-10"
         style={{
           top: `${scrollProgress}%`,
           transform: `translateY(-${scrollProgress}%)`,
