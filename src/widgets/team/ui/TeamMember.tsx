@@ -1,14 +1,5 @@
 import { GithubIcon, LinkedinIcon, TelegramIcon } from "@/shared/ui/Icons";
-
-export interface TeamMemberData {
-  name: string;
-  role: string;
-  location: string;
-  bio: string;
-  initials: string;
-  stack: string[];
-  links: { github?: string; telegram?: string; linkedin?: string };
-}
+import type { TeamMemberData } from "../model/members";
 
 const iconBtn =
   "flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-zinc-400 transition-colors hover:border-[#C8FF12]/50 hover:text-white";
@@ -25,7 +16,7 @@ export const TeamMember = ({
   return (
     <div className="group flex flex-col gap-6 rounded-3xl border border-white/10 bg-white/[0.03] p-8 transition-all duration-300 hover:-translate-y-1 hover:border-[#C8FF12]/40">
       <div className="flex items-center gap-5">
-        {/* Плейсхолдер-аватар с инициалами. Позже — фото или 3D-силуэт (Premium-фаза). */}
+        {/* Плейсхолдер-аватар с инициалами (фолбэк-режим). */}
         <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#D24A43] to-[#5b2a86] text-2xl font-bold text-white">
           {initials}
         </div>

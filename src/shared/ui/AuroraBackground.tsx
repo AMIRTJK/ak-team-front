@@ -24,6 +24,11 @@ export const AuroraBackground: FC<AuroraBackgroundProps> = ({
         <span className="aurora-blob aurora-blob--3" />
       </div>
       <div className={`absolute inset-0 ${overlayClassName}`} />
+
+      {/* Растушёвка верхнего и нижнего краёв в тёмный — чтобы цвет авроры
+          не доходил до стыков с соседними секциями (нет жёстких швов). */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[35vh] bg-gradient-to-b from-[#050505] to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[25vh] bg-gradient-to-t from-[#050505] to-transparent" />
     </div>
   );
 };

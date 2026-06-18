@@ -6,7 +6,7 @@ export const About = () => {
     <section className="relative w-full min-h-screen px-15 overflow-hidden">
       <AuroraBackground className="absolute inset-0 w-full h-full z-0" />
 
-      <div className="relative z-10 pt-[50vh] pb-[50vh]">
+      <div className="relative z-10 pt-[40vh] pb-[25vh]">
         <TextRender />
       </div>
     </section>

@@ -30,8 +30,9 @@ export const TextRender = () => {
           scrollTrigger: {
             trigger: containerRef.current,
             start: "top 80%",
-            end: "bottom top",
-            scrub: 2,
+            // Заканчиваем, пока текст ещё по центру и виден (а не когда ушёл за верх)
+            end: "bottom 55%",
+            scrub: 1,
           },
         },
       );
@@ -55,7 +56,7 @@ export const TextRender = () => {
   );
 
   return (
-    <div className="about__text-render h-[60vh]" style={{ margin: "20vh 0" }}>
+    <div className="about__text-render h-[60vh]" style={{ margin: "10vh 0" }}>
       <p
         ref={containerRef}
         style={{

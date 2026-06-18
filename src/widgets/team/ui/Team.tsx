@@ -1,34 +1,28 @@
-import { TeamMember, type TeamMemberData } from "./TeamMember";
+"use client";
 
-// TODO: вынести в entities/team-member при FSD-рефакторе
-const MEMBERS: TeamMemberData[] = [
-  {
-    name: "Amir Sharipov",
-    role: "Frontend Developer",
-    location: "Dushanbe, Tajikistan",
-    bio: "I build web applications with React and TypeScript.",
-    initials: "A",
-    stack: ["React", "TypeScript", "Next.js"],
-    links: {
-      github: "https://github.com/AMIRTJK",
-      telegram: "https://t.me/+992985719996",
-    },
-  },
-  {
-    name: "Komil Muminov",
-    role: "Frontend Developer",
-    location: "Dushanbe, Tajikistan",
-    bio: "I build web applications with React and TypeScript.",
-    initials: "K",
-    stack: ["React", "TypeScript", "Next.js"],
-    links: {
-      github: "https://github.com/Komil-Muminov",
-      telegram: "https://t.me/komilff7",
-    },
-  },
-];
+import { useEffect, useState } from "react";
+import { MEMBERS } from "../model/members";
+import { TeamMember } from "./TeamMember";
+import { Team3D } from "./Team3D";
 
 export const Team = () => {
+  // 3D-портрет только на десктопе и при разрешённой анимации.
+  // Иначе — статичные карточки (фолбэк).
+  const [enhanced, setEnhanced] = useState(false);
+
+  useEffect(() => {
+    const wide = window.matchMedia("(min-width: 1024px)");
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setEnhanced(wide.matches && !reduce.matches);
+    update();
+    wide.addEventListener("change", update);
+    reduce.addEventListener("change", update);
+    return () => {
+      wide.removeEventListener("change", update);
+      reduce.removeEventListener("change", update);
+    };
+  }, []);
+
   return (
     <section
       id="team"
@@ -45,11 +39,15 @@ export const Team = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          {MEMBERS.map((member) => (
-            <TeamMember key={member.name} {...member} />
-          ))}
-        </div>
+        {enhanced ? (
+          <Team3D />
+        ) : (
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            {MEMBERS.map((member) => (
+              <TeamMember key={member.name} {...member} />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

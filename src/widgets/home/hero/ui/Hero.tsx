@@ -598,6 +598,9 @@ export const Hero = ({
         </Canvas>
       </div>
 
+      {/* Растушёвка низа Hero в тёмный #050505 — бесшовный стык со следующей секцией (About) */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[5] h-[22vh] bg-gradient-to-b from-transparent to-[#050505]" />
+
       <section className="relative z-10 w-full h-full flex flex-col justify-between pt-28 pb-8 md:pt-32 md:pb-10 pointer-events-none">
         <div className="flex-1 flex items-center justify-center w-full">
           <div
