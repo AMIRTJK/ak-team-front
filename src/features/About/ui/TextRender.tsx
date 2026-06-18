@@ -31,7 +31,7 @@ export const TextRender = () => {
             trigger: containerRef.current,
             start: "top 80%",
             // Заканчиваем, пока текст ещё по центру и виден (а не когда ушёл за верх)
-            end: "bottom 55%",
+            end: "center 50%",
             scrub: 1,
           },
         },
