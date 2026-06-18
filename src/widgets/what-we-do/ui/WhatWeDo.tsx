@@ -43,7 +43,7 @@ export const WhatWeDo = () => {
   return (
     <section
       id="services"
-      className="flex w-full flex-col items-center bg-gradient-to-b from-[#161515] via-[#111111] to-[#030303] px-6 py-24 md:px-15"
+      className="flex w-full flex-col items-center bg-gradient-to-b from-[#050505] to-[#0a0a0a] px-6 py-24 md:px-15"
     >
       <div className="w-full max-w-7xl">
         <div className="flex flex-col items-center gap-4 text-center">
