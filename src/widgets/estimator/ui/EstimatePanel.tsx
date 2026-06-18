@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { animate, motion, useMotionValue, useTransform } from "framer-motion";
+import { useTranslation } from "@/shared/lib/i18n";
 import type { EstimateResult } from "../model/pricing";
 
 const Money = ({ value }: { value: number }) => {
@@ -25,6 +26,7 @@ interface EstimatePanelProps {
 }
 
 export const EstimatePanel = ({ result, onSubmit }: EstimatePanelProps) => {
+  const { t } = useTranslation();
   const weeks =
     result.weeksMin === result.weeksMax
       ? `${result.weeksMin}`
@@ -35,7 +37,7 @@ export const EstimatePanel = ({ result, onSubmit }: EstimatePanelProps) => {
       <div className="flex flex-col gap-6 rounded-3xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
         <div>
           <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">
-            Estimated budget
+            {t("estimator.estimated_budget")}
           </p>
           <p className="mt-2 flex flex-wrap items-baseline gap-x-2 text-3xl font-bold text-white md:text-4xl">
             <Money value={result.priceMin} />
@@ -46,10 +48,10 @@ export const EstimatePanel = ({ result, onSubmit }: EstimatePanelProps) => {
 
         <div>
           <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">
-            Timeline
+            {t("estimator.timeline")}
           </p>
           <p className="mt-2 text-2xl font-semibold text-[#C8FF12]">
-            {weeks} weeks
+            {weeks} {t("estimator.weeks")}
           </p>
         </div>
 
@@ -58,14 +60,14 @@ export const EstimatePanel = ({ result, onSubmit }: EstimatePanelProps) => {
           onClick={onSubmit}
           className="rounded-full bg-[#C8FF12] px-6 py-3 text-center font-semibold text-black transition-transform hover:scale-[1.02]"
         >
-          Get exact estimate →
+          {t("estimator.get_exact_estimate")}
         </button>
 
         <p className="text-xs leading-relaxed text-zinc-500">
-          Ballpark only — the final price depends on the details. We confirm
-          everything in a short call before anything starts.
+          {t("estimator.disclaimer")}
         </p>
       </div>
     </div>
   );
 };
+

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { TranslationProvider } from "@/shared/lib/i18n";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -49,8 +50,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`antialiased`} suppressHydrationWarning>
-        {children}
+        <TranslationProvider>{children}</TranslationProvider>
       </body>
     </html>
   );
 }
+

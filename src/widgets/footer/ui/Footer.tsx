@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useTranslation } from "@/shared/lib/i18n";
 import {
   GithubIcon,
   LinkedinIcon,
@@ -9,17 +12,18 @@ import { CONTACTS } from "@/shared/config";
 
 // Только реально существующие секции, чтобы в футере не было мёртвых ссылок
 const NAV = [
-  { label: "Home", href: "/" },
-  { label: "Services", href: "#services" },
-  { label: "Work", href: "#projects" },
-  { label: "Team", href: "#team" },
-  { label: "Contact", href: "#contact" },
+  { key: "home", href: "/" },
+  { key: "services", href: "#services" },
+  { key: "projects", href: "#projects" },
+  { key: "team", href: "#team" },
+  { key: "contact", href: "#contact" },
 ];
 
 const iconBtn =
   "flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-zinc-400 transition-colors hover:border-[#C8FF12]/50 hover:text-white";
 
 export const Footer = () => {
+  const { t } = useTranslation();
   const year = new Date().getFullYear();
 
   return (
@@ -28,19 +32,18 @@ export const Footer = () => {
         <div className="max-w-xs">
           <p className="text-xl font-semibold text-white">A&amp;K Team</p>
           <p className="mt-2 text-sm text-zinc-400">
-            Web, infrastructure &amp; AI engineering. A compact team with
-            studio-grade output.
+            {t("footer.desc")}
           </p>
         </div>
 
         <nav className="flex flex-col gap-2">
           {NAV.map((link) => (
             <Link
-              key={link.label}
+              key={link.key}
               href={link.href}
               className="text-sm text-zinc-400 transition-colors hover:text-white"
             >
-              {link.label}
+              {t(link.key === "home" ? "nav.home" : `nav.${link.key}`)}
             </Link>
           ))}
         </nav>
@@ -82,9 +85,10 @@ export const Footer = () => {
       </div>
 
       <div className="mx-auto mt-10 flex w-full max-w-7xl flex-col gap-2 border-t border-white/5 pt-6 text-xs text-zinc-500 sm:flex-row sm:items-center sm:justify-between">
-        <span>© {year} A&amp;K Team. All rights reserved.</span>
-        <span>Designed &amp; built by A&amp;K</span>
+        <span>© {year} A&amp;K Team. {t("footer.copyright")}</span>
+        <span>{t("footer.built_by")}</span>
       </div>
     </footer>
   );
 };
+

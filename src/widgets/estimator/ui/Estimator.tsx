@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { CONTACTS } from "@/shared/config";
+import { useTranslation } from "@/shared/lib/i18n";
 import {
   PROJECT_TYPES,
   MODULES,
@@ -115,6 +116,7 @@ const Segmented = ({
 );
 
 export const Estimator = () => {
+  const { t } = useTranslation();
   const [config, setConfig] = useState<EstimateConfig>({
     typeId: PROJECT_TYPES[0].id,
     moduleIds: [],
@@ -136,6 +138,20 @@ export const Estimator = () => {
 
   const result = useMemo(() => estimate(config), [config]);
 
+  const urgencyOptions = useMemo(() => {
+    return URGENCY.map((u) => ({
+      id: u.id,
+      label: t(`estimator.urgency.${u.id}`),
+    }));
+  }, [t]);
+
+  const supportOptions = useMemo(() => {
+    return SUPPORT.map((s) => ({
+      id: s.id,
+      label: t(`estimator.support.${s.id}`),
+    }));
+  }, [t]);
+
   const toggleModule = (id: string) =>
     setConfig((c) => ({
       ...c,
@@ -151,23 +167,23 @@ export const Estimator = () => {
   const handleSendEmail = () => {
     const type = PROJECT_TYPES.find((t) => t.id === config.typeId);
     const mods = MODULES.filter((m) => config.moduleIds.includes(m.id)).map(
-      (m) => m.label,
+      (m) => t(`estimator.modules.${m.id}.label`),
     );
     const urgency = URGENCY.find((u) => u.id === config.urgencyId);
     const support = SUPPORT.find((s) => s.id === config.supportId);
 
     const lines = [
-      "Project estimate request",
+      t("estimator.email.request_title"),
       "",
-      `Type: ${type?.label ?? "—"}`,
-      `Modules: ${mods.length ? mods.join(", ") : "—"}`,
-      `Urgency: ${urgency?.label ?? "—"}`,
-      `Support: ${support?.label ?? "—"}`,
+      `${t("estimator.email.project_type")}: ${type ? t(`estimator.project_types.${type.id}`) : "—"}`,
+      `${t("estimator.email.modules")}: ${mods.length ? mods.join(", ") : "—"}`,
+      `${t("estimator.email.urgency")}: ${urgency ? t(`estimator.urgency.${urgency.id}`) : "—"}`,
+      `${t("estimator.email.support")}: ${support ? t(`estimator.support.${support.id}`) : "—"}`,
       "",
-      `Ballpark: $${result.priceMin.toLocaleString("en-US")}–$${result.priceMax.toLocaleString("en-US")} · ${result.weeksMin}–${result.weeksMax} weeks`,
+      `${t("estimator.email.ballpark")}: $${result.priceMin.toLocaleString("en-US")}–$${result.priceMax.toLocaleString("en-US")} · ${result.weeksMin}–${result.weeksMax} ${t("estimator.email.weeks")}`,
     ];
     const subject = encodeURIComponent(
-      `Project estimate — ${type?.label ?? "project"}`,
+      `${t("estimator.email.subject")} — ${type ? t(`estimator.project_types.${type.id}`) : "project"}`,
     );
     const body = encodeURIComponent(lines.join("\n"));
     window.location.href = `mailto:${CONTACTS.email}?subject=${subject}&body=${body}`;
@@ -179,57 +195,56 @@ export const Estimator = () => {
       className="w-full bg-gradient-to-b from-[#050505] via-[#0a0a0a] to-[#050505] px-6 py-24 md:px-15"
     >
       <div className="mx-auto w-full max-w-7xl">
-        <div className="flex flex-col items-center gap-4 text-center">
-          <h2 className="text-[clamp(48px,11vw,160px)] font-semibold leading-[0.9] text-[#C8FF12]">
-            Estimate
+        <div className="flex flex-col items-center gap-8 text-center">
+          <h2 className="text-[clamp(48px,11vw,160px)] font-semibold leading-[1.2] text-[#C8FF12]">
+            {t("estimator.title")}
           </h2>
           <p className="mb-12 max-w-2xl text-lg text-zinc-300 md:text-2xl">
-            Pick what you need and get a ballpark instantly. The final quote
-            comes after a short chat — no surprises.
+            {t("estimator.subtitle")}
           </p>
         </div>
 
         <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
           <div className="flex flex-col gap-10">
-            <Group title="1 · Project type">
+            <Group title={t("estimator.step1")}>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                {PROJECT_TYPES.map((t) => (
+                {PROJECT_TYPES.map((tItem) => (
                   <SelectCard
-                    key={t.id}
-                    active={config.typeId === t.id}
-                    onClick={() => setConfig((c) => ({ ...c, typeId: t.id }))}
+                    key={tItem.id}
+                    active={config.typeId === tItem.id}
+                    onClick={() => setConfig((c) => ({ ...c, typeId: tItem.id }))}
                   >
-                    {t.label}
+                    {t(`estimator.project_types.${tItem.id}`)}
                   </SelectCard>
                 ))}
               </div>
             </Group>
 
-            <Group title="2 · Modules">
+            <Group title={t("estimator.step2")}>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {MODULES.map((m) => (
                   <ToggleCard
                     key={m.id}
                     active={config.moduleIds.includes(m.id)}
                     onClick={() => toggleModule(m.id)}
-                    label={m.label}
-                    hint={m.hint}
+                    label={t(`estimator.modules.${m.id}.label`)}
+                    hint={t(`estimator.modules.${m.id}.hint`)}
                   />
                 ))}
               </div>
             </Group>
 
-            <Group title="3 · Urgency">
+            <Group title={t("estimator.step3")}>
               <Segmented
-                options={URGENCY}
+                options={urgencyOptions}
                 activeId={config.urgencyId}
                 onSelect={(id) => setConfig((c) => ({ ...c, urgencyId: id }))}
               />
             </Group>
 
-            <Group title="4 · Support">
+            <Group title={t("estimator.step4")}>
               <Segmented
-                options={SUPPORT}
+                options={supportOptions}
                 activeId={config.supportId}
                 onSelect={(id) => setConfig((c) => ({ ...c, supportId: id }))}
               />
@@ -271,7 +286,7 @@ export const Estimator = () => {
               </button>
 
               <h3 className="text-2xl font-semibold text-[#C8FF12] mb-6">
-                Estimate Details
+                {t("estimator.modal.title")}
               </h3>
 
               {/* Estimate Summary Card */}
@@ -282,15 +297,15 @@ export const Estimator = () => {
                 <div className="flex flex-col gap-4">
                   {/* Project Type */}
                   <div className="flex justify-between items-start gap-4 pb-3 border-b border-white/5">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Project Type</span>
+                    <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500">{t("estimator.modal.project_type")}</span>
                     <span className="text-sm font-semibold text-white">
-                      {PROJECT_TYPES.find((t) => t.id === config.typeId)?.label ?? "—"}
+                      {t(`estimator.project_types.${config.typeId}`)}
                     </span>
                   </div>
 
                   {/* Modules */}
                   <div className="flex flex-col gap-2 pb-3 border-b border-white/5">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Selected Modules</span>
+                    <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500">{t("estimator.modal.selected_modules")}</span>
                     <div className="flex flex-wrap gap-1.5 mt-1">
                       {config.moduleIds.length > 0 ? (
                         MODULES.filter((m) => config.moduleIds.includes(m.id)).map((m) => (
@@ -298,46 +313,46 @@ export const Estimator = () => {
                             key={m.id}
                             className="rounded-full bg-[#C8FF12]/5 border border-[#C8FF12]/20 px-2.5 py-0.5 text-xs text-[#C8FF12]"
                           >
-                            {m.label}
+                            {t(`estimator.modules.${m.id}.label`)}
                           </span>
                         ))
                       ) : (
-                        <span className="text-sm text-zinc-500 font-medium">None selected</span>
+                        <span className="text-sm text-zinc-500 font-medium">{t("estimator.modal.none_selected")}</span>
                       )}
                     </div>
                   </div>
 
                   {/* Urgency */}
                   <div className="flex justify-between items-center gap-4 pb-3 border-b border-white/5">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Urgency</span>
+                    <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500">{t("estimator.modal.urgency")}</span>
                     <span className="text-sm font-medium text-white">
-                      {URGENCY.find((u) => u.id === config.urgencyId)?.label ?? "—"}
+                      {t(`estimator.urgency.${config.urgencyId}`)}
                     </span>
                   </div>
 
                   {/* Support */}
                   <div className="flex justify-between items-center gap-4 pb-3 border-b border-white/5">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Support</span>
+                    <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500">{t("estimator.modal.support")}</span>
                     <span className="text-sm font-medium text-white">
-                      {SUPPORT.find((s) => s.id === config.supportId)?.label ?? "—"}
+                      {t(`estimator.support.${config.supportId}`)}
                     </span>
                   </div>
 
                   {/* Pricing and Timeline Highlight */}
                   <div className="pt-2 flex justify-between items-baseline gap-4">
                     <div>
-                      <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500 block">Est. Budget</span>
+                      <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500 block">{t("estimator.modal.est_budget")}</span>
                       <span className="text-xl font-bold text-white mt-1 block">
                         ${result.priceMin.toLocaleString("en-US")} – ${result.priceMax.toLocaleString("en-US")}
                       </span>
                     </div>
                     <div className="text-right">
-                      <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500 block">Timeline</span>
+                      <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500 block">{t("estimator.modal.timeline")}</span>
                       <span className="text-lg font-bold text-[#C8FF12] mt-1 block">
                         {result.weeksMin === result.weeksMax
                           ? `${result.weeksMin}`
                           : `${result.weeksMin}–${result.weeksMax}`}{" "}
-                        weeks
+                        {t("estimator.weeks")}
                       </span>
                     </div>
                   </div>
@@ -354,19 +369,19 @@ export const Estimator = () => {
                   }}
                   className="w-full rounded-full bg-[#C8FF12] py-3 text-center font-semibold text-black hover:scale-[1.02] active:scale-[0.98] transition-transform duration-200 cursor-pointer"
                 >
-                  Confirm & Send Inquiry →
+                  {t("estimator.modal.confirm")}
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
                   className="w-full rounded-full border border-white/10 bg-transparent py-3 text-center font-semibold text-zinc-400 hover:border-white/20 hover:text-white transition-colors duration-200 cursor-pointer"
                 >
-                  Go Back
+                  {t("estimator.modal.go_back")}
                 </button>
               </div>
 
               <p className="text-center text-[10px] text-zinc-500 mt-4 leading-normal">
-                This will open your default email application with all specifications pre-filled.
+                {t("estimator.modal.action_disclaimer")}
               </p>
             </motion.div>
           </div>
@@ -375,3 +390,4 @@ export const Estimator = () => {
     </section>
   );
 };
+

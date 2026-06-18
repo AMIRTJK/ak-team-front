@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useTranslation } from "@/shared/lib/i18n";
 
 export type Theme = "stones" | "cyber" | "space";
 
@@ -13,6 +14,7 @@ export const ThemeSwitcher = ({
   activeTheme,
   onChangeTheme,
 }: ThemeSwitcherProps) => {
+  const { t } = useTranslation();
   const themes: Theme[] = ["stones", "cyber", "space"];
 
   return (
@@ -35,7 +37,7 @@ export const ThemeSwitcher = ({
             />
           )}
 
-          <span className="relative z-10 uppercase">{theme}</span>
+          <span className="relative z-10 uppercase">{t(`theme.${theme}`)}</span>
         </button>
       ))}
     </div>

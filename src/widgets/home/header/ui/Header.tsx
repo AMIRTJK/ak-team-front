@@ -3,12 +3,21 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useTranslation } from "@/shared/lib/i18n";
 
-const NAV_LINKS = ["Services", "Projects", "Team", "Reviews", "FAQ", "Contact"];
+const NAV_ITEMS = [
+  { key: "services", id: "services" },
+  { key: "projects", id: "projects" },
+  { key: "team", id: "team" },
+  { key: "reviews", id: "reviews" },
+  { key: "faq", id: "faq" },
+  { key: "contact", id: "contact" },
+];
 
 export const Header = () => {
   const [activeSection, setActiveSection] = useState("home");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (isMenuOpen) {
@@ -51,19 +60,19 @@ export const Header = () => {
                 : "text-zinc-500 hover:text-white"
             }`}
           >
-            Home
+            {t("nav.home")}
           </button>
-          {NAV_LINKS.map((link) => (
+          {NAV_ITEMS.map((item) => (
             <button
-              key={link}
-              onClick={(e) => handleScroll(e as any, link.toLowerCase())}
+              key={item.key}
+              onClick={(e) => handleScroll(e as any, item.id)}
               className={`text-2xl font-bold transition-colors ${
-                activeSection === link.toLowerCase()
+                activeSection === item.id
                   ? "text-white"
                   : "text-zinc-500 hover:text-white"
               }`}
             >
-              {link}
+              {t(`nav.${item.key}`)}
             </button>
           ))}
         </div>
@@ -89,16 +98,18 @@ export const Header = () => {
 
         <div className="relative z-10 hidden items-center gap-2 border-l border-white/15 pl-4 md:flex">
           <NavLink
-            label="Home"
+            label={t("nav.home")}
+            id="home"
             isActive={activeSection === "home"}
             onClick={scrollToTop}
           />
-          {NAV_LINKS.map((link) => (
+          {NAV_ITEMS.map((item) => (
             <NavLink
-              key={link}
-              label={link}
-              isActive={activeSection === link.toLowerCase()}
-              onClick={(e) => handleScroll(e, link.toLowerCase())}
+              key={item.key}
+              label={t(`nav.${item.key}`)}
+              id={item.id}
+              isActive={activeSection === item.id}
+              onClick={(e) => handleScroll(e, item.id)}
             />
           ))}
         </div>
@@ -127,15 +138,17 @@ export const Header = () => {
 
 const NavLink = ({
   label,
+  id,
   isActive,
   onClick,
 }: {
   label: string;
+  id: string;
   isActive: boolean;
   onClick: (e: any) => void;
 }) => (
   <Link
-    href={label === "Home" ? "/" : `/#${label.toLowerCase()}`}
+    href={id === "home" ? "/" : `/#${id}`}
     onClick={onClick}
     className="group relative px-2 lg:px-2 2xl:px-3"
   >
@@ -157,3 +170,4 @@ const NavLink = ({
     ></span>
   </Link>
 );
+

@@ -7,6 +7,7 @@ import * as THREE from "three";
 import gsap from "gsap";
 import { ScrollIcon } from "@/shared/ui/Icons";
 import localFont from "next/font/local";
+import { useTranslation } from "@/shared/lib/i18n";
 
 const aDLaMDisplayRegular = localFont({
   src: "../../../../../public/fonts/ADLaMDisplay-Regular.ttf",
@@ -546,6 +547,7 @@ export const Hero = ({
   theme?: "stones" | "cyber" | "space";
 }) => {
   const titleContainerRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
 
   const bgColors = {
     stones: "bg-[#111111]",
@@ -646,21 +648,21 @@ export const Hero = ({
         <div className="relative w-full px-6 md:px-12 flex flex-col md:flex-row justify-between items-start md:items-end gap-10 md:gap-0 h-auto">
           <div className="max-w-full md:max-w-sm lg:max-w-md w-full relative pointer-events-auto">
             <p className="text-[#D24A43] text-[10px] md:text-xs font-bold tracking-[0.2em] mb-2 md:mb-4 uppercase">
-              Web Studio
+              {t("hero.web_studio")}
             </p>
-            <h2 className="text-white text-3xl md:text-4xl lg:text-5xl font-serif italic font-bold leading-tight mb-3 md:mb-4">
-              We craft digital <br className="hidden md:block" /> experiences
-            </h2>
+            <h2
+              className="text-white text-3xl md:text-4xl lg:text-5xl font-serif italic font-bold leading-tight mb-3 md:mb-4"
+              dangerouslySetInnerHTML={{ __html: t("hero.title") }}
+            />
             <p className="text-zinc-400 text-xs md:text-sm max-w-[90%] md:max-w-full leading-relaxed">
-              We engineer the success of your vision through technology and
-              innovation.
+              {t("hero.description")}
             </p>
             <div className="w-full h-[1px] bg-transparent mt-5 md:mt-6 border-dashed border-b border-white/20"></div>
           </div>
 
           <div className="flex flex-col items-center gap-3 w-full justify-center md:w-auto md:absolute md:left-1/2 md:-translate-x-1/2 relative pointer-events-auto">
             <span className="text-zinc-400 text-[10px] font-bold tracking-widest uppercase">
-              Scroll to discover
+              {t("hero.scroll")}
             </span>
             <div className="text-zinc-400">
               <ScrollIcon />

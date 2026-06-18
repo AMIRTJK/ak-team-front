@@ -1,54 +1,32 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useTranslation } from "@/shared/lib/i18n";
 
 const STEPS = [
-  {
-    title: "Brief & discovery",
-    description:
-      "We dig into your goal, users and constraints before writing a single line of code.",
-  },
-  {
-    title: "Design & prototype",
-    description:
-      "Wireframes and clickable UI, so the result is agreed before development starts — no surprises.",
-  },
-  {
-    title: "Development",
-    description:
-      "We build in short iterations with working demos you can follow at every step.",
-  },
-  {
-    title: "QA & polish",
-    description:
-      "Testing, performance and accessibility checks before anything goes live.",
-  },
-  {
-    title: "Launch",
-    description:
-      "We deploy, configure the server and hand over a working, documented product.",
-  },
-  {
-    title: "Support & growth",
-    description:
-      "We stay on to maintain, monitor and evolve what we built as your needs change.",
-  },
+  { id: 0 },
+  { id: 1 },
+  { id: 2 },
+  { id: 3 },
+  { id: 4 },
+  { id: 5 },
 ];
 
 export const Process = () => {
+  const { t } = useTranslation();
+
   return (
     <section
       id="process"
       className="w-full bg-gradient-to-b from-[#050505] to-[#0a0a0a] px-6 py-24 md:px-15"
     >
       <div className="mx-auto w-full max-w-7xl">
-        <div className="flex flex-col items-center gap-4 text-center">
-          <h2 className="text-[clamp(44px,10vw,140px)] font-semibold leading-[0.9] text-[#C8FF12]">
-            How we work
+        <div className="flex flex-col items-center gap-8 text-center">
+          <h2 className="text-[clamp(44px,10vw,140px)] font-semibold leading-[1.2] text-[#C8FF12]">
+            {t("process.title")}
           </h2>
           <p className="mb-16 max-w-2xl text-lg text-zinc-300 md:text-2xl">
-            A clear path from idea to a running product — you always know what
-            happens next.
+            {t("process.subtitle")}
           </p>
         </div>
 
@@ -57,7 +35,7 @@ export const Process = () => {
           <ol className="flex flex-col gap-10">
             {STEPS.map((step, i) => (
               <motion.li
-                key={step.title}
+                key={i}
                 className="relative flex gap-6"
                 initial={{ opacity: 0, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -69,10 +47,10 @@ export const Process = () => {
                 </div>
                 <div className="pt-1.5 md:pt-3.5">
                   <h3 className="text-xl font-semibold text-white md:text-2xl">
-                    {step.title}
+                    {t(`process.steps.${i}.title`)}
                   </h3>
                   <p className="mt-2 max-w-xl leading-relaxed text-zinc-400">
-                    {step.description}
+                    {t(`process.steps.${i}.description`)}
                   </p>
                 </div>
               </motion.li>
@@ -83,3 +61,4 @@ export const Process = () => {
     </section>
   );
 };
+
