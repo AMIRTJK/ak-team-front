@@ -6,11 +6,13 @@ import { AnimatePresence, motion } from "framer-motion";
 import { GithubIcon, LinkedinIcon, TelegramIcon } from "@/shared/ui/Icons";
 import { MEMBERS } from "../model/members";
 import { ParticleFigure } from "./ParticleFigure";
+import { useTranslation } from "@/shared/lib/i18n";
 
 const iconBtn =
   "flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-zinc-400 transition-colors hover:border-white/40 hover:text-white";
 
 export const Team3D = () => {
+  const { t } = useTranslation();
   const [memberIndex, setMemberIndex] = useState(0);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
@@ -36,6 +38,7 @@ export const Team3D = () => {
   }, [mounted, isDesktop]);
 
   const member = MEMBERS[memberIndex];
+  const memberKey = member.name.toLowerCase().replace(" ", "_");
   const active = member.hotspots.find((h) => h.id === activeId) ?? null;
 
   const selectMember = (i: number) => {
@@ -100,6 +103,7 @@ export const Team3D = () => {
         <div className="pointer-events-none absolute inset-0 z-10">
           {member.hotspots.map((h) => {
             const isActive = h.id === activeId;
+            const translatedLabel = t(`team.members.${memberKey}.${h.id}`);
             return (
               <button
                 key={h.id}
@@ -107,7 +111,7 @@ export const Team3D = () => {
                 onClick={() => setActiveId(isActive ? null : h.id)}
                 style={{ top: h.position.top, left: h.position.left }}
                 className="pointer-events-auto absolute flex -translate-x-1/2 -translate-y-1/2 items-center gap-2"
-                aria-label={`Show ${h.label}`}
+                aria-label={`Show ${translatedLabel}`}
               >
                 <span className="relative flex h-3 w-3">
                   <span
@@ -126,7 +130,7 @@ export const Team3D = () => {
                       : "border-white/10 text-zinc-300"
                   }`}
                 >
-                  {h.label}
+                  {translatedLabel}
                 </span>
               </button>
             );
@@ -155,11 +159,11 @@ export const Team3D = () => {
 
         <div>
           <h3 className="text-3xl font-semibold text-white">{member.name}</h3>
-          <p style={{ color: member.accent }}>{member.role}</p>
-          <p className="text-sm text-zinc-500">{member.location}</p>
+          <p style={{ color: member.accent }}>{t(`team.members.${memberKey}.role`)}</p>
+          <p className="text-sm text-zinc-500">{t(`team.members.${memberKey}.location`)}</p>
         </div>
 
-        <p className="text-zinc-400">{member.bio}</p>
+        <p className="text-zinc-400">{t(`team.members.${memberKey}.bio`)}</p>
 
         <div className="min-h-[140px] rounded-2xl border border-white/10 bg-white/[0.03] p-6">
           <AnimatePresence mode="wait">
@@ -172,10 +176,10 @@ export const Team3D = () => {
                 transition={{ duration: 0.25 }}
               >
                 <h4 className="mb-3 text-sm font-semibold uppercase tracking-widest text-zinc-500">
-                  {active.label}
+                  {t(`team.members.${memberKey}.${active.id}`)}
                 </h4>
                 <ul className="flex flex-wrap gap-2">
-                  {active.items.map((item) => (
+                  {(t(`team.members.${memberKey}.${active.id}_list`) || []).map((item: string) => (
                     <li
                       key={item}
                       className="rounded-full border border-white/10 bg-black/30 px-3 py-1 text-sm text-zinc-200"
@@ -193,8 +197,7 @@ export const Team3D = () => {
                 exit={{ opacity: 0 }}
                 className="text-sm text-zinc-500"
               >
-                Tap a glowing point on the figure to explore skills, stack and
-                projects.
+                {t("team.hint")}
               </motion.p>
             )}
           </AnimatePresence>

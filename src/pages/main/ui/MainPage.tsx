@@ -1,3 +1,5 @@
+"use client";
+
 import { About } from "@/features/About";
 import { ScrollIndicator } from "@/shared/ui/ScrollIndicator";
 import { WhatWeDo } from "@/widgets/what-we-do";
@@ -12,24 +14,27 @@ import { Faq } from "@/widgets/faq";
 import { Contact } from "@/widgets/contact";
 import { Footer } from "@/widgets/footer";
 import { Home } from "@/widgets/home";
+import { TranslationProvider } from "@/shared/lib/i18n";
 
 export default function MainPage() {
   return (
-    <main className="min-h-screen bg-[#050505] overflow-x-hidden relative font-sans flex flex-col">
-      <Home />
-      <About />
-      <ScrollIndicator />
-      <WhatWeDo />
-      <TechMarquee />
-      <WebTypes />
-      <Estimator />
-      <Work />
-      <Team />
-      <Process />
-      <Reviews />
-      <Faq />
-      <Contact />
-      <Footer />
-    </main>
+    <TranslationProvider>
+      <main className="min-h-screen bg-[#050505] overflow-x-hidden relative font-sans flex flex-col">
+        <Home />
+        <About />
+        <ScrollIndicator />
+        <WhatWeDo />
+        <TechMarquee />
+        <WebTypes />
+        <Estimator />
+        <Work />
+        <Team />
+        <Process />
+        <Reviews />
+        <Faq />
+        <Contact />
+        <Footer />
+      </main>
+    </TranslationProvider>
   );
 }

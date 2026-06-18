@@ -1,4 +1,5 @@
 import { GithubIcon, LinkedinIcon, TelegramIcon } from "@/shared/ui/Icons";
+import { useTranslation } from "@/shared/lib/i18n";
 import type { TeamMemberData } from "../model/members";
 
 const iconBtn =
@@ -6,13 +7,16 @@ const iconBtn =
 
 export const TeamMember = ({
   name,
-  role,
-  location,
-  bio,
   initials,
   stack,
   links,
 }: TeamMemberData) => {
+  const { t } = useTranslation();
+  const memberKey = name.toLowerCase().replace(" ", "_");
+  const role = t(`team.members.${memberKey}.role`);
+  const location = t(`team.members.${memberKey}.location`);
+  const bio = t(`team.members.${memberKey}.bio`);
+
   return (
     <div className="group flex flex-col gap-6 rounded-3xl border border-white/10 bg-white/[0.03] p-8 transition-all duration-300 hover:-translate-y-1 hover:border-[#C8FF12]/40">
       <div className="flex items-center gap-5">

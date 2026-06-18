@@ -5,11 +5,13 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SplitType from "split-type";
+import { useTranslation } from "@/shared/lib/i18n";
 
 gsap.registerPlugin(ScrollTrigger);
 
 export const TextRender = () => {
   const containerRef = useRef<HTMLParagraphElement>(null);
+  const { t, language } = useTranslation();
 
   useGSAP(
     () => {
@@ -52,12 +54,13 @@ export const TextRender = () => {
         });
       }
     },
-    { scope: containerRef },
+    { scope: containerRef, dependencies: [language] },
   );
 
   return (
     <div className="about__text-render h-[60vh]" style={{ margin: "10vh 0" }}>
       <p
+        key={language}
         ref={containerRef}
         style={{
           lineHeight: "1.2",
@@ -66,7 +69,7 @@ export const TextRender = () => {
           fontWeight: "500",
         }}
       >
-        A&amp;K is a compact engineering team that{" "}
+        {t("about.part1")}
         <span
           className="highlight-text"
           style={{
@@ -78,11 +81,11 @@ export const TextRender = () => {
             paddingBottom: "0.05em",
           }}
         >
-          ships like a full-scale studio
+          {t("about.highlight")}
         </span>
-        . We design, build and deploy web apps, complex sites, server
-        infrastructure and local AI — then stay on to keep every line running.
+        {t("about.part2")}
       </p>
     </div>
   );
 };
+
