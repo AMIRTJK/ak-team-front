@@ -1,28 +1,20 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0a0a0a;
+  --foreground: #ededed;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    Arial, sans-serif;
 }
 
 /* SCROLLBAR */
@@ -33,4 +25,85 @@ body {
 
 *::-webkit-scrollbar {
   display: none; /* Для Chrome, Safari, Edge, Opera */
+}
+
+/* AURORA BACKGROUND — лёгкий анимированный фон вместо тяжёлого видео */
+
+.aurora-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(90px);
+  opacity: 0.45;
+  will-change: transform;
+}
+
+.aurora-blob--1 {
+  width: 48vw;
+  height: 48vw;
+  left: -8%;
+  top: -12%;
+  background: #d24a43;
+  animation: aurora-1 22s ease-in-out infinite;
+}
+
+.aurora-blob--2 {
+  width: 42vw;
+  height: 42vw;
+  right: -6%;
+  top: 8%;
+  background: #5b2a86;
+  animation: aurora-2 26s ease-in-out infinite;
+}
+
+.aurora-blob--3 {
+  width: 40vw;
+  height: 40vw;
+  left: 25%;
+  bottom: -15%;
+  background: #1e3a8a;
+  animation: aurora-3 30s ease-in-out infinite;
+}
+
+@keyframes aurora-1 {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(14vw, 12vh) scale(1.25);
+  }
+}
+
+@keyframes aurora-2 {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1.1);
+  }
+  50% {
+    transform: translate(-12vw, 16vh) scale(0.9);
+  }
+}
+
+@keyframes aurora-3 {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(8vw, -12vh) scale(1.2);
+  }
+}
+
+/* ACCESSIBILITY — базовое уважение к prefers-reduced-motion.
+   Полное отключение JS-анимаций (GSAP / R3F) — отдельная задача. */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }

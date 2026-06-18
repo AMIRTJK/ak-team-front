@@ -1,7 +1,7 @@
 import { About } from "@/features/About";
-import { OurWork } from "@/features/OurWork/ui";
 import { ScrollIndicator } from "@/shared/ui/ScrollIndicator";
-import { GamepadShowcase } from "@/widgets/gamepad-showcase";
+import { WhatWeDo } from "@/widgets/what-we-do";
+import { TechShowcase } from "@/widgets/tech-showcase";
 import { Home } from "@/widgets/home";
 
 export default function MainPage() {
@@ -10,11 +10,8 @@ export default function MainPage() {
       <Home />
       <About />
       <ScrollIndicator />
-      <OurWork />
-
-      <div className="block w-full">
-        <GamepadShowcase />
-      </div>
+      <WhatWeDo />
+      <TechShowcase />
 
       <div className="h-10 w-full" />
     </main>
