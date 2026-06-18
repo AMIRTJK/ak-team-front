@@ -30,8 +30,9 @@ export const TextRender = () => {
           scrollTrigger: {
             trigger: containerRef.current,
             start: "top 80%",
-            end: "bottom top",
-            scrub: 2,
+            // Заканчиваем, пока текст ещё по центру и виден (а не когда ушёл за верх)
+            end: "center 50%",
+            scrub: 1,
           },
         },
       );
@@ -55,7 +56,7 @@ export const TextRender = () => {
   );
 
   return (
-    <div className="about__text-render h-[60vh]" style={{ margin: "20vh 0" }}>
+    <div className="about__text-render h-[60vh]" style={{ margin: "10vh 0" }}>
       <p
         ref={containerRef}
         style={{
@@ -65,22 +66,22 @@ export const TextRender = () => {
           fontWeight: "500",
         }}
       >
-        As a division of{" "}
+        A&amp;K is a compact engineering team that{" "}
         <span
           className="highlight-text"
           style={{
-            color: "#d4fb08",
-            backgroundImage: "linear-gradient(to right, #d4fb08, #d4fb08)",
+            color: "#C8FF12",
+            backgroundImage: "linear-gradient(to right, #C8FF12, #C8FF12)",
             backgroundRepeat: "no-repeat",
             backgroundPosition: "left bottom",
             backgroundSize: "0% 0.08em",
             paddingBottom: "0.05em",
           }}
         >
-          Wonder Makers ↗
+          ships like a full-scale studio
         </span>
-        , a digital product studio fueled by excitement, we specialize in game
-        design, Web3 and immersive website development.
+        . We design, build and deploy web apps, complex sites, server
+        infrastructure and local AI — then stay on to keep every line running.
       </p>
     </div>
   );
