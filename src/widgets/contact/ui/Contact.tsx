@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { MailIcon, TelegramIcon, WhatsappIcon } from "@/shared/ui/Icons";
+import { MailIcon, TelegramIcon, WhatsappIcon, Select } from "@/shared/ui";
 import { CONTACTS } from "@/shared/config";
 
 const PROJECT_TYPES = [
@@ -116,40 +116,25 @@ export const Contact = () => {
             required
           />
           <div className="grid gap-4 sm:grid-cols-2">
-            <select
-              className={inputClass}
+            <Select
+              className="w-full"
               value={form.type}
-              onChange={update("type")}
-            >
-              {PROJECT_TYPES.map((t) => (
-                <option key={t} value={t} className="bg-[#0a0a0a]">
-                  {t}
-                </option>
-              ))}
-            </select>
-            <select
-              className={inputClass}
+              options={PROJECT_TYPES}
+              onChange={(val) => setForm((prev) => ({ ...prev, type: val }))}
+            />
+            <Select
+              className="w-full"
               value={form.budget}
-              onChange={update("budget")}
-            >
-              {BUDGETS.map((b) => (
-                <option key={b} value={b} className="bg-[#0a0a0a]">
-                  {b}
-                </option>
-              ))}
-            </select>
+              options={BUDGETS}
+              onChange={(val) => setForm((prev) => ({ ...prev, budget: val }))}
+            />
           </div>
-          <select
-            className={inputClass}
+          <Select
+            className="w-full"
             value={form.timeline}
-            onChange={update("timeline")}
-          >
-            {TIMELINES.map((t) => (
-              <option key={t} value={t} className="bg-[#0a0a0a]">
-                {t}
-              </option>
-            ))}
-          </select>
+            options={TIMELINES}
+            onChange={(val) => setForm((prev) => ({ ...prev, timeline: val }))}
+          />
           <textarea
             className={`${inputClass} min-h-32 resize-y`}
             placeholder="A few words about your project"

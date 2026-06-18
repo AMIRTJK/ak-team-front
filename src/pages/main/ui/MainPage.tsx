@@ -7,6 +7,7 @@ import { Estimator } from "@/widgets/estimator";
 import { Work } from "@/widgets/work";
 import { Team } from "@/widgets/team";
 import { Process } from "@/widgets/process";
+import { Reviews } from "@/widgets/reviews";
 import { Faq } from "@/widgets/faq";
 import { Contact } from "@/widgets/contact";
 import { Footer } from "@/widgets/footer";
@@ -25,6 +26,7 @@ export default function MainPage() {
       <Work />
       <Team />
       <Process />
+      <Reviews />
       <Faq />
       <Contact />
       <Footer />
