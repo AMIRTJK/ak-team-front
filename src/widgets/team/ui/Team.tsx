@@ -1,28 +1,8 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import { MEMBERS } from "../model/members";
 import { TeamMember } from "./TeamMember";
 import { Team3D } from "./Team3D";
 
 export const Team = () => {
-  // 3D-портрет только на десктопе и при разрешённой анимации.
-  // Иначе — статичные карточки (фолбэк).
-  const [enhanced, setEnhanced] = useState(false);
-
-  useEffect(() => {
-    const wide = window.matchMedia("(min-width: 1024px)");
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const update = () => setEnhanced(wide.matches && !reduce.matches);
-    update();
-    wide.addEventListener("change", update);
-    reduce.addEventListener("change", update);
-    return () => {
-      wide.removeEventListener("change", update);
-      reduce.removeEventListener("change", update);
-    };
-  }, []);
-
   return (
     <section
       id="team"
@@ -39,15 +19,19 @@ export const Team = () => {
           </p>
         </div>
 
-        {enhanced ? (
+        {/* Desktop 3D layout */}
+        <div className="hidden lg:block">
           <Team3D />
-        ) : (
+        </div>
+
+        {/* Mobile static cards fallback */}
+        <div className="lg:hidden">
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             {MEMBERS.map((member) => (
               <TeamMember key={member.name} {...member} />
             ))}
           </div>
-        )}
+        </div>
       </div>
     </section>
   );

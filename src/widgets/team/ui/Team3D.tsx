@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { AnimatePresence, motion } from "framer-motion";
 import { GithubIcon, LinkedinIcon, TelegramIcon } from "@/shared/ui/Icons";
@@ -13,6 +13,27 @@ const iconBtn =
 export const Team3D = () => {
   const [memberIndex, setMemberIndex] = useState(0);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setMounted(true);
+    const wide = window.matchMedia("(min-width: 1024px)");
+    setIsDesktop(wide.matches);
+    const update = () => setIsDesktop(wide.matches);
+    wide.addEventListener("change", update);
+    return () => wide.removeEventListener("change", update);
+  }, []);
+
+  useEffect(() => {
+    if (mounted && isDesktop) {
+      const timer = setTimeout(() => {
+        setLoading(false);
+      }, 700); // 700ms gives WebGL ample time to initialize in the background
+      return () => clearTimeout(timer);
+    }
+  }, [mounted, isDesktop]);
 
   const member = MEMBERS[memberIndex];
   const active = member.hotspots.find((h) => h.id === activeId) ?? null;
@@ -26,9 +47,55 @@ export const Team3D = () => {
     <div className="grid items-center gap-10 lg:grid-cols-2">
       {/* Фигура + хотспоты */}
       <div className="relative mx-auto aspect-square w-full max-w-lg">
-        <Canvas camera={{ position: [0, 0, 6.5], fov: 45 }} dpr={[1, 2]}>
-          <ParticleFigure color={member.accent} />
-        </Canvas>
+        {/* WebGL Canvas — mounted ONLY after loading finishes so the browser never paints a white <canvas> */}
+        {mounted && isDesktop && !loading && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            className="absolute inset-0"
+          >
+            <Canvas
+              camera={{ position: [0, 0, 6.5], fov: 45 }}
+              dpr={[1, 2]}
+              style={{ background: "transparent" }}
+            >
+              <ParticleFigure color={member.accent} />
+            </Canvas>
+          </motion.div>
+        )}
+
+        {/* Skeleton / Loading state — covers the area completely with dark bg */}
+        <AnimatePresence>
+          {loading && (
+            <motion.div
+              initial={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4 }}
+              className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-[#050505] rounded-3xl border border-white/5 overflow-hidden"
+            >
+              {/* Subtle background glow */}
+              <div
+                className="absolute inset-0 opacity-40 blur-2xl animate-pulse"
+                style={{
+                  background: `radial-gradient(circle, ${member.accent}22 0%, transparent 70%)`
+                }}
+              />
+              
+              {/* Skeleton bust silhouette */}
+              <div className="relative flex flex-col items-center justify-center gap-4">
+                <div className="h-40 w-40 rounded-full bg-white/[0.02] border border-white/5 animate-pulse flex items-center justify-center">
+                  <div
+                    className="h-28 w-28 rounded-full blur-lg"
+                    style={{ backgroundColor: `${member.accent}11` }}
+                  />
+                </div>
+                <div className="h-4.5 w-36 rounded-full bg-white/[0.02] border border-white/5 animate-pulse" />
+                <div className="h-3 w-24 rounded-full bg-white/[0.01] border border-white/5 animate-pulse" />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <div className="pointer-events-none absolute inset-0 z-10">
           {member.hotspots.map((h) => {
