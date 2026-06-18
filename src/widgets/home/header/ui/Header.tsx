@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useTranslation } from "@/shared/lib/i18n";
+import { LanguageSwitcher } from "@/features/language-switcher";
+import { ThemeSwitcher, type Theme } from "@/features/theme-switcher";
 
 const NAV_ITEMS = [
   { key: "services", id: "services" },
@@ -14,7 +16,12 @@ const NAV_ITEMS = [
   { key: "contact", id: "contact" },
 ];
 
-export const Header = () => {
+interface HeaderProps {
+  activeTheme: Theme;
+  onChangeTheme: (theme: Theme) => void;
+}
+
+export const Header = ({ activeTheme, onChangeTheme }: HeaderProps) => {
   const [activeSection, setActiveSection] = useState("home");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { t } = useTranslation();
@@ -45,13 +52,13 @@ export const Header = () => {
   };
 
   return (
-    <header className="fixed top-16 md:top-6 left-0 w-full z-[100] flex justify-center pointer-events-none">
+    <header className="fixed top-4 md:top-6 left-0 w-full z-[100] flex justify-center pointer-events-none">
       <div
-        className={`fixed inset-0 w-screen h-[100dvh] bg-[#0A0A0A] transition-opacity duration-300 md:hidden flex flex-col items-center justify-center pointer-events-auto ${
+        className={`fixed inset-0 w-screen h-[100dvh] bg-[#0A0A0A]/95 backdrop-blur-2xl transition-opacity duration-300 md:hidden flex flex-col items-center justify-center pointer-events-auto ${
           isMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
       >
-        <div className="flex flex-col items-center gap-6 mt-12">
+        <div className="flex flex-col items-center gap-6 mt-6 w-full max-w-[280px]">
           <button
             onClick={scrollToTop}
             className={`text-2xl font-bold transition-colors ${
@@ -75,10 +82,25 @@ export const Header = () => {
               {t(`nav.${item.key}`)}
             </button>
           ))}
+
+          {/* Switchers section inside mobile menu drawer */}
+          <div className="flex flex-col items-center gap-6 mt-8 pt-8 border-t border-white/10 w-full">
+            <div className="flex flex-col items-center gap-2">
+              <span className="text-[10px] text-zinc-500 font-bold tracking-widest uppercase">Language</span>
+              <LanguageSwitcher />
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              <span className="text-[10px] text-zinc-500 font-bold tracking-widest uppercase">Theme</span>
+              <ThemeSwitcher
+                activeTheme={activeTheme}
+                onChangeTheme={onChangeTheme}
+              />
+            </div>
+          </div>
         </div>
       </div>
 
-      <nav className="pointer-events-auto relative z-50 flex items-center justify-between gap-4 rounded-full bg-black/40 px-4 py-2 backdrop-blur-xl transition-all lg:gap-3 lg:px-3 lg:py-1.5 2xl:gap-4 2xl:px-4 2xl:py-2 border border-white/10 w-[95%] max-w-fit shadow-2xl">
+      <nav className="pointer-events-auto relative z-50 flex items-center justify-between gap-4 rounded-full bg-black/40 px-4 py-2 backdrop-blur-xl transition-all lg:gap-3 lg:px-3 lg:py-1.5 2xl:gap-4 2xl:px-4 2xl:py-2 border border-white/10 w-[92%] md:w-auto md:max-w-fit shadow-2xl">
         <Link
           href="/"
           onClick={scrollToTop}

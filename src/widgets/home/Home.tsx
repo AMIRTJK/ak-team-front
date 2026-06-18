@@ -12,16 +12,16 @@ export const Home = () => {
 
   return (
     <div className="fullscreen relative ">
-      <Header />
+      <Header activeTheme={activeTheme} onChangeTheme={setActiveTheme} />
       <Hero theme={activeTheme} />
 
-      {/* ЛЕВЫЙ ВЕРХНИЙ УГОЛ: Переключатель языков */}
-      <div className="fixed top-4 left-4 md:top-6 md:left-8 z-[70]">
+      {/* ЛЕВЫЙ ВЕРХНИЙ УГОЛ: Переключатель языков (скрыт на мобильных) */}
+      <div className="hidden md:block fixed top-4 left-4 md:top-6 md:left-8 z-[70]">
         <LanguageSwitcher />
       </div>
 
-      {/* ПРАВЫЙ ВЕРХНИЙ УГОЛ: Переключатель тем */}
-      <div className="fixed top-4 right-4 md:top-6 md:right-8 z-[70]">
+      {/* ПРАВЫЙ ВЕРХНИЙ УГОЛ: Переключатель тем (скрыт на мобильных) */}
+      <div className="hidden md:block fixed top-4 right-4 md:top-6 md:right-8 z-[70]">
         <ThemeSwitcher
           activeTheme={activeTheme}
           onChangeTheme={setActiveTheme}
