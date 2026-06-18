@@ -22,7 +22,7 @@ export const WhatWeDo = () => {
     >
       <div className="w-full max-w-7xl">
         <div className="flex flex-col items-center gap-8 text-center">
-          <h2 className="text-[clamp(56px,12vw,180px)] font-semibold leading-[1.2] text-[#C8FF12]">
+          <h2 className="text-[clamp(40px,8.5vw,130px)] font-semibold leading-[1.2] text-[#C8FF12]">
             {t("what_we_do.title")}
           </h2>
           <p className="mb-12 max-w-2xl text-lg text-zinc-300 md:text-2xl">
