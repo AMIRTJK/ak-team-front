@@ -3,9 +3,15 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import localFont from "next/font/local";
 import { useTranslation } from "@/shared/lib/i18n";
 import { LanguageSwitcher } from "@/features/language-switcher";
 import { ThemeSwitcher, type Theme } from "@/features/theme-switcher";
+
+const megrimRegular = localFont({
+  src: "../../../../../public/fonts/Megrim-Regular.ttf",
+  display: "swap",
+});
 
 const NAV_ITEMS = [
   { key: "services", id: "services" },
@@ -100,7 +106,7 @@ export const Header = ({ activeTheme, onChangeTheme }: HeaderProps) => {
         </div>
       </div>
 
-      <nav className="pointer-events-auto relative z-50 flex items-center justify-between gap-4 rounded-full bg-black/40 px-4 py-2 backdrop-blur-xl transition-all lg:gap-3 lg:px-3 lg:py-1.5 2xl:gap-4 2xl:px-4 2xl:py-2 border border-white/10 w-[92%] md:w-auto md:max-w-fit shadow-2xl">
+      <nav className="pointer-events-auto relative z-50 flex items-center justify-between w-[92%] md:w-auto md:max-w-fit gap-4 transition-all rounded-full bg-black/40 px-4 py-2 backdrop-blur-xl border border-white/10 shadow-2xl lg:gap-3 lg:px-3 lg:py-1.5 2xl:gap-4 2xl:px-4 2xl:py-2">
         <Link
           href="/"
           onClick={scrollToTop}
@@ -117,6 +123,11 @@ export const Header = ({ activeTheme, onChangeTheme }: HeaderProps) => {
             />
           </div>
         </Link>
+
+        {/* Center: Brand name on mobile only */}
+        <div className={`md:hidden text-white text-base font-medium tracking-[0.25em] select-none ${megrimRegular.className}`}>
+          A&K TEAM
+        </div>
 
         <div className="relative z-10 hidden items-center gap-2 border-l border-white/15 pl-4 md:flex">
           <NavLink
