@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Canvas } from "@react-three/fiber";
 import { AnimatePresence, motion } from "framer-motion";
 import { GithubIcon, LinkedinIcon, TelegramIcon } from "@/shared/ui/Icons";
 import { MEMBERS } from "../model/members";
-import { ParticleFigure } from "./ParticleFigure";
+import { AvatarStage } from "./AvatarStage";
 import { useTranslation } from "@/shared/lib/i18n";
 
 const iconBtn =
@@ -41,6 +40,11 @@ export const Team3D = () => {
   const memberKey = member.name.toLowerCase().replace(" ", "_");
   const active = member.hotspots.find((h) => h.id === activeId) ?? null;
 
+  // Каждая вкладка задаёт свой угол — модель «поворачивается» при выборе.
+  // Нет активной вкладки → лицом к зрителю (0).
+  const activeIndex = member.hotspots.findIndex((h) => h.id === activeId);
+  const targetAngle = activeIndex >= 0 ? activeIndex * Math.PI * 0.6 : 0;
+
   const selectMember = (i: number) => {
     setMemberIndex(i);
     setActiveId(null);
@@ -58,13 +62,11 @@ export const Team3D = () => {
             transition={{ duration: 0.5 }}
             className="absolute inset-0"
           >
-            <Canvas
-              camera={{ position: [0, 0, 6.5], fov: 45 }}
-              dpr={[1, 2]}
-              style={{ background: "transparent" }}
-            >
-              <ParticleFigure color={member.accent} />
-            </Canvas>
+            <AvatarStage
+              accent={member.accent}
+              targetAngle={targetAngle}
+              modelUrl={member.model}
+            />
           </motion.div>
         )}
 
@@ -141,20 +143,28 @@ export const Team3D = () => {
       {/* Детали участника */}
       <div className="flex flex-col gap-6">
         <div className="flex gap-2">
-          {MEMBERS.map((m, i) => (
-            <button
-              key={m.name}
-              type="button"
-              onClick={() => selectMember(i)}
-              className={`rounded-full border px-5 py-2 text-sm font-medium transition-all ${
-                i === memberIndex
-                  ? "border-[#C8FF12] bg-[#C8FF12]/10 text-white"
-                  : "border-white/10 bg-white/[0.03] text-zinc-400 hover:border-white/25"
-              }`}
-            >
-              {m.name.split(" ")[0]}
-            </button>
-          ))}
+          {MEMBERS.map((m, i) => {
+            const isActive = i === memberIndex;
+            return (
+              <button
+                key={m.name}
+                type="button"
+                onClick={() => selectMember(i)}
+                style={
+                  isActive
+                    ? { borderColor: m.accent, backgroundColor: `${m.accent}1a` }
+                    : undefined
+                }
+                className={`rounded-full border px-5 py-2 text-sm font-medium transition-all ${
+                  isActive
+                    ? "text-white"
+                    : "border-white/10 bg-white/[0.03] text-zinc-400 hover:border-white/25"
+                }`}
+              >
+                {m.name.split(" ")[0]}
+              </button>
+            );
+          })}
         </div>
 
         <div>

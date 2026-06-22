@@ -203,7 +203,7 @@ export const translations = {
     team: {
       title: "Team",
       subtitle: "Two engineers, one standard — the people who actually build your product.",
-      hint: "Tap a glowing point on the figure to explore skills, stack and projects.",
+      hint: "Tap a glowing point on the figure to explore skills, experience, stack and projects.",
       members: {
         amir_sharipov: {
           role: "Frontend Developer",
@@ -222,6 +222,13 @@ export const translations = {
           projects_list: [
             "Electronic Document Management System",
             "Job Application & Assessment System"
+          ],
+          experience: "Experience",
+          experience_list: [
+            "Enterprise web applications",
+            "Document management systems",
+            "Hiring & assessment platforms",
+            "React & TypeScript SPAs"
           ]
         },
         komil_muminov: {
@@ -241,6 +248,13 @@ export const translations = {
           projects_list: [
             "Electronic Document Management System",
             "Job Application & Assessment System"
+          ],
+          experience: "Experience",
+          experience_list: [
+            "Enterprise web applications",
+            "Document management systems",
+            "Hiring & assessment platforms",
+            "React & TypeScript SPAs"
           ]
         }
       }
@@ -584,7 +598,7 @@ export const translations = {
     team: {
       title: "Команда",
       subtitle: "Два инженера, один стандарт — люди, которые непосредственно создают ваш продукт.",
-      hint: "Нажмите на светящуюся точку на фигуре, чтобы изучить навыки, стек и проекты.",
+      hint: "Нажмите на светящуюся точку на фигуре, чтобы изучить навыки, опыт, стек и проекты.",
       members: {
         amir_sharipov: {
           role: "Frontend-разработчик",
@@ -603,6 +617,13 @@ export const translations = {
           projects_list: [
             "Система электронного документооборота",
             "Система подачи заявок и оценки кандидатов"
+          ],
+          experience: "Опыт",
+          experience_list: [
+            "Корпоративные веб-приложения",
+            "Системы документооборота",
+            "Платформы найма и оценки",
+            "SPA на React и TypeScript"
           ]
         },
         komil_muminov: {
@@ -622,6 +643,13 @@ export const translations = {
           projects_list: [
             "Система электронного документооборота",
             "Система подачи заявок и оценки кандидатов"
+          ],
+          experience: "Опыт",
+          experience_list: [
+            "Корпоративные веб-приложения",
+            "Системы документооборота",
+            "Платформы найма и оценки",
+            "SPA на React и TypeScript"
           ]
         }
       }

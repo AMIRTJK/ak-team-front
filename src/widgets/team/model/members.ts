@@ -15,6 +15,8 @@ export interface TeamMemberData {
   stack: string[];
   links: { github?: string; telegram?: string; linkedin?: string };
   hotspots: Hotspot[];
+  /** URL GLB-аватара (MetaPerson/Mixamo) в /public. Пусто → placeholder-манекен. */
+  model?: string;
 }
 
 // Позиции хотспотов вокруг фигуры (в % контейнера).
@@ -22,6 +24,7 @@ const POS = {
   skills: { top: "15%", left: "10%" },
   stack: { top: "24%", left: "88%" },
   projects: { top: "72%", left: "85%" },
+  experience: { top: "62%", left: "8%" },
 };
 
 // TODO: дополнить hotspots реальными данными (опыт, достижения) по мере получения от команды.
@@ -33,6 +36,7 @@ export const MEMBERS: TeamMemberData[] = [
     bio: "I build web applications with React and TypeScript.",
     initials: "A",
     accent: "#D24A43",
+    model: "/models/amir.fbx",
     stack: ["React", "TypeScript", "Next.js"],
     links: {
       github: "https://github.com/AMIRTJK",
@@ -65,6 +69,17 @@ export const MEMBERS: TeamMemberData[] = [
           "Job Application & Assessment System",
         ],
       },
+      {
+        id: "experience",
+        label: "Experience",
+        position: POS.experience,
+        items: [
+          "Enterprise web applications",
+          "Document management systems",
+          "Hiring & assessment platforms",
+          "React & TypeScript SPAs",
+        ],
+      },
     ],
   },
   {
@@ -74,6 +89,7 @@ export const MEMBERS: TeamMemberData[] = [
     bio: "I build web applications with React and TypeScript.",
     initials: "K",
     accent: "#C8FF12",
+    model: "/models/komil.fbx",
     stack: ["React", "TypeScript", "Next.js"],
     links: {
       github: "https://github.com/Komil-Muminov",
@@ -104,6 +120,17 @@ export const MEMBERS: TeamMemberData[] = [
         items: [
           "Electronic Document Management System",
           "Job Application & Assessment System",
+        ],
+      },
+      {
+        id: "experience",
+        label: "Experience",
+        position: POS.experience,
+        items: [
+          "Enterprise web applications",
+          "Document management systems",
+          "Hiring & assessment platforms",
+          "React & TypeScript SPAs",
         ],
       },
     ],
