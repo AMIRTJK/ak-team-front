@@ -165,6 +165,7 @@ const FlashlightText = ({
 
 const ParticleText = ({ visible }: { visible: boolean }) => {
   const { viewport, pointer } = useThree();
+  const pointsRef = useRef<THREE.Points>(null);
   const materialRef = useRef<THREE.ShaderMaterial>(null);
 
   const targetMouse = useRef(new THREE.Vector2(0, 0));
@@ -212,6 +213,7 @@ const ParticleText = ({ visible }: { visible: boolean }) => {
   const uniforms = useMemo(
     () => ({
       uMouse: { value: new THREE.Vector2(0, 0) },
+      uScale: { value: 1.0 },
       uTime: { value: 0 },
       uColor: { value: new THREE.Color("#ffffff") },
     }),
@@ -220,18 +222,27 @@ const ParticleText = ({ visible }: { visible: boolean }) => {
 
   useFrame((state) => {
     if (!materialRef.current) return;
+
+    // Lock position and rotation to the camera to keep text centered
+    if (pointsRef.current) {
+      pointsRef.current.position.copy(state.camera.position);
+      pointsRef.current.rotation.copy(state.camera.rotation);
+      pointsRef.current.translateZ(-4);
+    }
+
     targetMouse.current.x = pointer.x * (viewport.width / 2);
     targetMouse.current.y = pointer.y * (viewport.height / 2);
-    currentMouse.current.lerp(targetMouse.current, 0.1);
+    currentMouse.current.lerp(targetMouse.current, 0.15);
 
     materialRef.current.uniforms.uMouse.value.copy(currentMouse.current);
+    materialRef.current.uniforms.uScale.value = scale;
     materialRef.current.uniforms.uTime.value = state.clock.elapsedTime;
   });
 
-  const scale = Math.min(1, viewport.width / 12);
+  const scale = Math.min(0.65, viewport.width / 18);
 
   return (
-    <points scale={scale} position={[0, 0, 1]} visible={visible}>
+    <points ref={pointsRef} scale={scale} visible={visible}>
       <bufferGeometry>
         <bufferAttribute attach="attributes-position" args={[positions, 3]} />
         <bufferAttribute attach="attributes-aRandom" args={[randoms, 1]} />
@@ -244,36 +255,102 @@ const ParticleText = ({ visible }: { visible: boolean }) => {
         blending={THREE.AdditiveBlending}
         vertexShader={`
           uniform vec2 uMouse;
+          uniform float uScale;
           uniform float uTime;
           attribute float aRandom;
           varying float vAlpha;
+          varying float vRandom;
+          
           void main() {
+            vRandom = aRandom;
             vec3 pos = position;
-            float dist = distance(pos.xy, uMouse);
-            float radius = 1.5; 
+            
+            // World-space distance to black hole
+            float dist = distance(pos.xy * uScale, uMouse);
+            float radius = 2.0; 
             if (dist < radius) {
-              float force = pow((radius - dist) / radius, 1.5);
-              vec2 dir = pos.xy - uMouse;
-              if (length(dir) > 0.0) { dir = normalize(dir); } else { dir = vec2(aRandom, aRandom); }
-              pos.xy += dir * force * 1.5 * aRandom;
-              pos.z += force * 2.0 * aRandom;
+              float force = pow((radius - dist) / radius, 2.0);
+              vec2 toMouse = uMouse - pos.xy * uScale;
+              float len = length(toMouse);
+              vec2 dir = len > 0.0 ? toMouse / len : vec2(0.0);
+              vec2 swirl = vec2(-dir.y, dir.x);
+              
+              // Displace in world space (divide by uScale to convert to local coordinates)
+              pos.xy += (dir * force * 0.8 + swirl * force * 1.2) / uScale;
+              pos.z -= (force * 1.5) / uScale;
             }
-            pos.x += sin(uTime * 1.0 + aRandom * 10.0) * 0.02;
-            pos.y += cos(uTime * 1.0 + aRandom * 10.0) * 0.02;
+            
+            pos.x += sin(uTime * 0.5 + aRandom * 10.0) * 0.03;
+            pos.y += cos(uTime * 0.5 + aRandom * 10.0) * 0.03;
+            
             vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
-            gl_PointSize = (4.0 * aRandom + 1.5) * (5.0 / -mvPosition.z);
+            
+            float sizeMultiplier = 1.0;
+            if (aRandom > 0.8) {
+              sizeMultiplier = 3.5;
+            } else if (aRandom > 0.55) {
+              sizeMultiplier = 2.0;
+            }
+            
+            gl_PointSize = (4.0 * aRandom + 1.5) * sizeMultiplier * (5.0 / -mvPosition.z);
             gl_Position = projectionMatrix * mvPosition;
-            vAlpha = 1.0 - clamp(pos.z * 0.5, 0.0, 1.0);
+            
+            // Event horizon fade-out in world space (fade between 0.22 and 0.14, event horizon is at 0.19)
+            float displacedWorldDist = distance(pos.xy * uScale, uMouse);
+            float eventHorizonFade = smoothstep(0.14, 0.22, displacedWorldDist);
+            vAlpha = eventHorizonFade * (1.0 - clamp(abs(pos.z * uScale) * 0.2, 0.0, 1.0));
           }
         `}
         fragmentShader={`
           uniform vec3 uColor;
+          uniform float uTime;
           varying float vAlpha;
+          varying float vRandom;
+          
           void main() {
             vec2 center = gl_PointCoord - vec2(0.5);
-            if (length(center) > 0.5) discard;
-            float alpha = smoothstep(0.5, 0.2, length(center)) * vAlpha;
-            gl_FragColor = vec4(uColor, alpha);
+            float distToCenter = length(center);
+            if (distToCenter > 0.5) discard;
+            
+            vec2 p = center * 2.0;
+            float r = length(p);
+            
+            vec3 finalColor = uColor;
+            float finalAlpha = vAlpha;
+            
+            if (vRandom > 0.4) {
+              // --- BRIGHT GLOWING STARS ---
+              float twinkle = sin(uTime * (3.0 + vRandom * 5.0) + vRandom * 50.0) * 0.4 + 0.6;
+              float spike = exp(-abs(p.x) * 12.0 - abs(p.y) * 1.5) + exp(-abs(p.y) * 12.0 - abs(p.x) * 1.5);
+              float centerGlow = exp(-r * 3.0);
+              
+              float starIntensity = (centerGlow + spike * 0.6) * twinkle;
+              
+              vec3 starColor = vec3(1.0);
+              if (vRandom > 0.8) {
+                // Blue giant star
+                starColor = vec3(0.55, 0.8, 1.0);
+              } else if (vRandom > 0.6) {
+                // Yellow/gold star
+                starColor = vec3(1.0, 0.9, 0.7);
+              } else {
+                // Red/orange star
+                starColor = vec3(1.0, 0.7, 0.65);
+              }
+              
+              finalColor = starColor;
+              finalAlpha *= starIntensity;
+              
+            } else {
+              // --- BACKGROUND DUST ---
+              float twinkle = sin(uTime * 6.0 + vRandom * 100.0) * 0.5 + 0.5;
+              float glow = exp(-r * 4.0);
+              
+              finalColor = vec3(0.9, 0.95, 1.0);
+              finalAlpha *= glow * twinkle * 0.8;
+            }
+            
+            gl_FragColor = vec4(finalColor, finalAlpha);
           }
         `}
       />
@@ -498,46 +575,258 @@ const ThemeCyber = () => {
   );
 };
 
-const ThemeSpace = () => {
-  const planets = useMemo(
-    () =>
-      new Array(40).fill(null).map(() => ({
-        position: [
-          (Math.random() - 0.5) * 40,
-          (Math.random() - 0.5) * 40,
-          (Math.random() - 0.5) * 30 - 10,
-        ],
-        scale: Math.random() * 1.5 + 0.1,
-        color: Math.random() > 0.9 ? "#D24A43" : "#FFFFFF",
-      })),
-    [],
+const SpacePlanet = ({
+  position,
+  scale,
+  type,
+}: {
+  position: [number, number, number];
+  scale: number;
+  type: "gas" | "ice" | "ringed" | "asteroid";
+}) => {
+  const meshRef = useRef<THREE.Mesh>(null);
+  const ringRef = useRef<THREE.Mesh>(null);
+
+  useFrame((state) => {
+    if (meshRef.current) {
+      meshRef.current.rotation.y = state.clock.elapsedTime * 0.1;
+      meshRef.current.rotation.x = state.clock.elapsedTime * 0.05;
+    }
+  });
+
+  return (
+    <group position={position}>
+      {type === "asteroid" ? (
+        <mesh ref={meshRef} scale={scale}>
+          <dodecahedronGeometry args={[1, 1]} />
+          <meshStandardMaterial
+            color="#5a4d41"
+            roughness={0.95}
+            metalness={0.1}
+            flatShading
+          />
+        </mesh>
+      ) : type === "ringed" ? (
+        <group scale={scale}>
+          <mesh ref={meshRef}>
+            <sphereGeometry args={[1, 32, 32]} />
+            <meshStandardMaterial
+              color="#e2bf7d"
+              roughness={0.7}
+              metalness={0.2}
+            />
+          </mesh>
+          <mesh rotation={[Math.PI / 2.5, 0, 0]} ref={ringRef}>
+            <ringGeometry args={[1.4, 2.3, 64]} />
+            <meshStandardMaterial
+              color="#a88c52"
+              roughness={0.8}
+              transparent
+              opacity={0.85}
+              side={THREE.DoubleSide}
+            />
+          </mesh>
+        </group>
+      ) : type === "ice" ? (
+        <mesh ref={meshRef} scale={scale}>
+          <sphereGeometry args={[1, 32, 32]} />
+          <meshStandardMaterial
+            color="#4ba3e3"
+            roughness={0.4}
+            metalness={0.3}
+          />
+        </mesh>
+      ) : (
+        <mesh ref={meshRef} scale={scale}>
+          <sphereGeometry args={[1, 32, 32]} />
+          <meshStandardMaterial
+            color="#d24a43"
+            roughness={0.6}
+            metalness={0.1}
+          />
+        </mesh>
+      )}
+    </group>
   );
+};
+
+const ThemeSpace = () => {
+  const planets = useMemo(() => {
+    const list = [];
+    const types: ("gas" | "ice" | "ringed" | "asteroid")[] = ["gas", "ice", "ringed", "asteroid"];
+    for (let i = 0; i < 30; i++) {
+      const type = types[i % types.length];
+      list.push({
+        id: i,
+        position: [
+          (Math.random() - 0.5) * 45,
+          (Math.random() - 0.5) * 45,
+          (Math.random() - 0.5) * 35 - 15,
+        ] as [number, number, number],
+        scale: type === "asteroid"
+          ? Math.random() * 0.6 + 0.3
+          : Math.random() * 1.2 + 0.4,
+        type,
+      });
+    }
+    return list;
+  }, []);
+
   return (
     <>
-      <fog attach="fog" args={["#000000", 10, 30]} />
-      <ambientLight intensity={0.5} />
-      <pointLight position={[10, 10, 10]} intensity={2} color="#ffffff" />
+      <fog attach="fog" args={["#000000", 10, 35]} />
+      <ambientLight intensity={0.6} />
+      <pointLight position={[15, 15, 15]} intensity={2.5} color="#ffffff" />
+      <pointLight position={[-15, -15, -15]} intensity={1.5} color="#3c1478" />
       <Stars
         radius={50}
         depth={50}
-        count={3000}
-        factor={4}
-        saturation={0}
+        count={3500}
+        factor={5}
+        saturation={0.5}
         fade
-        speed={1}
+        speed={1.2}
       />
-      {planets.map((props, i) => (
-        <Float key={i} speed={0.5} rotationIntensity={1} floatIntensity={1}>
-          <mesh
-            position={new THREE.Vector3(...props.position)}
+      {planets.map((props) => (
+        <Float key={props.id} speed={0.4} rotationIntensity={1} floatIntensity={1}>
+          <SpacePlanet
+            position={props.position}
             scale={props.scale}
-          >
-            <sphereGeometry args={[1, 32, 32]} />
-            <meshStandardMaterial color={props.color} roughness={0.8} />
-          </mesh>
+            type={props.type}
+          />
         </Float>
       ))}
     </>
+  );
+};
+
+const BlackHole = ({ visible }: { visible: boolean }) => {
+  const { viewport, pointer } = useThree();
+  const groupRef = useRef<THREE.Group>(null);
+  const diskRef = useRef<THREE.Mesh>(null);
+  const shaderRef = useRef<THREE.ShaderMaterial>(null);
+
+  const targetMouse = useRef(new THREE.Vector2(0, 0));
+  const currentMouse = useRef(new THREE.Vector2(0, 0));
+
+  useFrame((state) => {
+    if (!groupRef.current) return;
+
+    targetMouse.current.x = pointer.x * (viewport.width / 2);
+    targetMouse.current.y = pointer.y * (viewport.height / 2);
+    currentMouse.current.lerp(targetMouse.current, 0.15);
+
+    groupRef.current.position.copy(state.camera.position);
+    groupRef.current.rotation.copy(state.camera.rotation);
+
+    groupRef.current.translateZ(-4);
+    groupRef.current.translateX(currentMouse.current.x);
+    groupRef.current.translateY(currentMouse.current.y);
+
+    if (shaderRef.current) {
+      shaderRef.current.uniforms.uTime.value = state.clock.elapsedTime;
+    }
+  });
+
+  const uniforms = useMemo(
+    () => ({
+      uTime: { value: 0 },
+    }),
+    [],
+  );
+
+  if (!visible) return null;
+
+  return (
+    <group ref={groupRef}>
+      {/* 1. Outer Swirling Accretion Disk (Procedural Shader with Doppler Beaming) */}
+      <mesh ref={diskRef} position={[0, 0, -0.05]}>
+        <ringGeometry args={[0.25, 0.9, 64]} />
+        <shaderMaterial
+          ref={shaderRef}
+          uniforms={uniforms}
+          transparent
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+          side={THREE.DoubleSide}
+          vertexShader={`
+            varying vec3 vPosition;
+            void main() {
+              vPosition = position;
+              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+          `}
+          fragmentShader={`
+            varying vec3 vPosition;
+            uniform float uTime;
+            
+            void main() {
+              float r = length(vPosition.xy);
+              float angle = atan(vPosition.y, vPosition.x);
+              
+              // Swirling flow pattern (spiral accretion)
+              float swirl = angle - uTime * 2.5 - r * 8.0;
+              float noise = sin(swirl * 4.0) * cos(swirl * 2.0 - r * 4.0) * 0.5 + 0.5;
+              
+              float innerR = 0.25;
+              float outerR = 0.9;
+              float intensity = smoothstep(innerR, innerR + 0.08, r) * smoothstep(outerR, outerR - 0.15, r);
+              
+              // Relativistic Doppler Shift simulation
+              // The side moving towards us (right side, x > 0) is brighter and shifted towards hot yellow/white.
+              // The side moving away (left side, x < 0) is dimmer and shifted towards cooler red.
+              float doppler = 1.0 + (vPosition.x / (r + 0.001)) * 0.45;
+              
+              // Apply doppler effect to accretion disk intensity
+              intensity *= doppler;
+              
+              // Color gradient: hot yellow-white at inner edge, dark red-brown at outer edge
+              float tColor = (r - innerR) / (outerR - innerR);
+              
+              // Doppler-affected colors: shifting inner/outer colors based on velocity
+              vec3 colorInner = mix(vec3(1.0, 0.4, 0.0), vec3(1.0, 0.95, 0.8), clamp(doppler - 0.6, 0.0, 1.0));
+              vec3 colorOuter = mix(vec3(0.3, 0.02, 0.0), vec3(0.8, 0.2, 0.0), clamp(doppler - 0.6, 0.0, 1.0));
+              vec3 baseColor = mix(colorInner, colorOuter, tColor);
+              
+              // Add swirling hot plasma flares (modulated by Doppler)
+              baseColor = mix(baseColor, vec3(1.0, 0.95, 0.7), noise * 0.4 * doppler);
+              
+              gl_FragColor = vec4(baseColor, intensity * (0.4 + noise * 0.6));
+            }
+          `}
+        />
+      </mesh>
+
+      {/* 2. Inner Gravitational Lensing Halo (White-hot lensed light ring) */}
+      <mesh position={[0, 0, -0.04]}>
+        <ringGeometry args={[0.2, 0.27, 64]} />
+        <meshBasicMaterial
+          color="#ffe066"
+          transparent
+          opacity={0.8}
+          blending={THREE.AdditiveBlending}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
+
+      {/* 3. Event Horizon */}
+      <mesh scale={0.19} position={[0, 0, -0.08]}>
+        <sphereGeometry args={[1, 32, 32]} />
+        <meshBasicMaterial color="#000000" />
+      </mesh>
+      
+      {/* 4. Corona Glow (Warm reddish-orange cosmic dust halo) */}
+      <mesh scale={1.3} position={[0, 0, -0.1]}>
+        <ringGeometry args={[0.0, 1.0, 32]} />
+        <meshBasicMaterial
+          color="#aa2200"
+          transparent
+          opacity={0.15}
+          blending={THREE.AdditiveBlending}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
+    </group>
   );
 };
 
@@ -597,6 +886,7 @@ export const Hero = ({
           {theme === "cyber" && <ThemeCyber />}
           {theme === "space" && <ThemeSpace />}
           <ParticleText visible={theme === "space"} />
+          <BlackHole visible={theme === "space"} />
         </Canvas>
       </div>
 
@@ -633,7 +923,7 @@ export const Hero = ({
                 className="absolute inset-0 pointer-events-none transition-opacity duration-500"
                 style={{
                   background:
-                    "radial-gradient(circle 8vw at var(--mouse-x) var(--mouse-y), rgba(0,0,0,1) 15%, rgba(60,20,120,0.5) 30%, transparent 60%)",
+                    "radial-gradient(circle 12vw at var(--mouse-x) var(--mouse-y), rgba(60,20,120,0.2) 0%, rgba(0,0,0,0) 70%)",
                   mixBlendMode: "normal",
                 }}
               />
