@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import localFont from "next/font/local";
+import { useLenis } from "lenis/react";
 import { useTranslation } from "@/shared/lib/i18n";
 import { LanguageSwitcher } from "@/features/language-switcher";
 import { ThemeSwitcher, type Theme } from "@/features/theme-switcher";
@@ -22,39 +23,93 @@ const NAV_ITEMS = [
   { key: "contact", id: "contact" },
 ];
 
+const SECTION_IDS = NAV_ITEMS.map((item) => item.id);
+
+/**
+ * Активный пункт меню по реальной позиции скролла (а не только по клику).
+ * Секция считается активной, когда её центр пересекает центр вьюпорта;
+ * у самого верха страницы активна «Home».
+ */
+function useScrollSpy() {
+  const [active, setActive] = useState("home");
+
+  useEffect(() => {
+    const els = SECTION_IDS.map((id) => document.getElementById(id)).filter(
+      (el): el is HTMLElement => Boolean(el),
+    );
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+        if (visible[0]) setActive(visible[0].target.id);
+      },
+      { rootMargin: "-45% 0px -45% 0px", threshold: [0, 0.2, 0.5, 0.8, 1] },
+    );
+    els.forEach((el) => observer.observe(el));
+
+    const onScroll = () => {
+      if (window.scrollY < 240) setActive("home");
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
+
+  return active;
+}
+
 interface HeaderProps {
   activeTheme: Theme;
   onChangeTheme: (theme: Theme) => void;
 }
 
 export const Header = ({ activeTheme, onChangeTheme }: HeaderProps) => {
-  const [activeSection, setActiveSection] = useState("home");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { t } = useTranslation();
+  const lenis = useLenis();
+  const activeSection = useScrollSpy();
 
   useEffect(() => {
     if (isMenuOpen) {
       document.body.style.overflow = "hidden";
+      lenis?.stop();
     } else {
       document.body.style.overflow = "unset";
+      lenis?.start();
     }
-  }, [isMenuOpen]);
+  }, [isMenuOpen, lenis]);
 
   const handleScroll = (e: React.MouseEvent<HTMLElement>, id: string) => {
     e.preventDefault();
-    setActiveSection(id);
     setIsMenuOpen(false);
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
+    // Закрываем меню → ждём кадр, чтобы вернулся скролл body, и плавно едем.
+    requestAnimationFrame(() => {
+      if (lenis) {
+        lenis.scrollTo(`#${id}`, { offset: -90 });
+      } else {
+        document
+          .getElementById(id)
+          ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    });
   };
 
   const scrollToTop = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
-    setActiveSection("home");
     setIsMenuOpen(false);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    requestAnimationFrame(() => {
+      if (lenis) {
+        lenis.scrollTo(0);
+      } else {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    });
   };
 
   return (
@@ -78,7 +133,7 @@ export const Header = ({ activeTheme, onChangeTheme }: HeaderProps) => {
           {NAV_ITEMS.map((item) => (
             <button
               key={item.key}
-              onClick={(e) => handleScroll(e as any, item.id)}
+              onClick={(e) => handleScroll(e, item.id)}
               className={`text-2xl font-bold transition-colors ${
                 activeSection === item.id
                   ? "text-white"
@@ -178,7 +233,7 @@ const NavLink = ({
   label: string;
   id: string;
   isActive: boolean;
-  onClick: (e: any) => void;
+  onClick: (e: React.MouseEvent<HTMLAnchorElement>) => void;
 }) => (
   <Link
     href={id === "home" ? "/" : `/#${id}`}

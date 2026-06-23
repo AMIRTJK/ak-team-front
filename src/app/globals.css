@@ -99,6 +99,134 @@ canvas {
   }
 }
 
+/* WHAT WE DO — живые узоры на фоне карточек.
+   Каждый паттерн анимируется по смыслу своей карточки.
+   Значения подобраны так, чтобы движение было хорошо заметно. */
+
+/* 01 — концентрические кольца: волна пульсации от центра наружу */
+@keyframes cap-ripple {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+.cap-ripple circle {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cap-ripple 2.2s ease-in-out infinite;
+}
+.cap-ripple circle:nth-child(2) {
+  animation-delay: 0.18s;
+}
+.cap-ripple circle:nth-child(3) {
+  animation-delay: 0.36s;
+}
+.cap-ripple circle:nth-child(4) {
+  animation-delay: 0.54s;
+}
+.cap-ripple circle:nth-child(5) {
+  animation-delay: 0.72s;
+}
+.cap-ripple circle:nth-child(6) {
+  animation-delay: 0.9s;
+}
+
+/* 02 + 05 — вращение фигуры вокруг собственного центра */
+@keyframes cap-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.cap-spin {
+  transform-box: view-box;
+  transform-origin: 42.5px 42.5px;
+  animation: cap-spin 12s linear infinite;
+}
+.cap-spin-rings {
+  transform-box: view-box;
+  transform-origin: 20px 20px;
+  animation: cap-spin 14s linear infinite;
+}
+
+/* 03 — узлы пульсируют, по связям «бегут» данные */
+@keyframes cap-dash {
+  to {
+    stroke-dashoffset: -20;
+  }
+}
+@keyframes cap-node {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(2);
+    opacity: 1;
+  }
+}
+.cap-flow line {
+  stroke-dasharray: 4 6;
+  animation: cap-dash 0.9s linear infinite;
+}
+.cap-flow line:nth-of-type(2) {
+  animation-delay: 0.3s;
+}
+.cap-flow line:nth-of-type(3) {
+  animation-delay: 0.6s;
+}
+.cap-flow line:nth-of-type(4) {
+  animation-delay: 0.9s;
+}
+.cap-flow line:nth-of-type(5) {
+  animation-delay: 1.2s;
+}
+.cap-flow circle {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cap-node 1.6s ease-in-out infinite;
+}
+.cap-flow circle:nth-of-type(2) {
+  animation-delay: 0.4s;
+}
+.cap-flow circle:nth-of-type(3) {
+  animation-delay: 0.8s;
+}
+.cap-flow circle:nth-of-type(4) {
+  animation-delay: 1.2s;
+}
+
+/* 04 — гексагоны расходятся кольцами, как радар */
+@keyframes cap-expand {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  35% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+.cap-expand polygon {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cap-expand 2.6s ease-out infinite;
+}
+.cap-expand polygon:nth-child(2) {
+  animation-delay: 0.87s;
+}
+.cap-expand polygon:nth-child(3) {
+  animation-delay: 1.73s;
+}
+
 /* ACCESSIBILITY — базовое уважение к prefers-reduced-motion.
    Полное отключение JS-анимаций (GSAP / R3F) — отдельная задача. */
 

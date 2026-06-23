@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { useLenis } from "lenis/react";
 
 interface Particle {
   x: number;
@@ -24,6 +25,7 @@ export const ScrollIndicator = () => {
   const particlesRef = useRef<Particle[]>([]);
   const lastScrollYRef = useRef(0);
   const scrollDirectionRef = useRef<"up" | "down">("down");
+  const lenis = useLenis();
 
   const spawnParticlesDirect = (progress: number, direction: "up" | "down") => {
     if (!canvasRef.current || !trackRef.current) return;
@@ -101,7 +103,13 @@ export const ScrollIndicator = () => {
 
       const docHeight =
         document.documentElement.scrollHeight - window.innerHeight;
-      window.scrollTo(0, docHeight * percentage);
+      const target = docHeight * percentage;
+      // Через Lenis мгновенно (immediate), иначе плавный скролл вернёт позицию.
+      if (lenis) {
+        lenis.scrollTo(target, { immediate: true });
+      } else {
+        window.scrollTo(0, target);
+      }
 
       setScrollProgress(percentage * 100);
 
@@ -131,7 +139,7 @@ export const ScrollIndicator = () => {
       document.body.style.cursor = "";
       document.body.style.userSelect = "";
     };
-  }, [isDragging, scrollProgress]);
+  }, [isDragging, scrollProgress, lenis]);
 
   // Particle render loop
   useEffect(() => {
@@ -218,7 +226,12 @@ export const ScrollIndicator = () => {
           const percentage = y / rect.height;
           const docHeight =
             document.documentElement.scrollHeight - window.innerHeight;
-          window.scrollTo({ top: docHeight * percentage, behavior: "smooth" });
+          const target = docHeight * percentage;
+          if (lenis) {
+            lenis.scrollTo(target);
+          } else {
+            window.scrollTo({ top: target, behavior: "smooth" });
+          }
         }
       }}
     >

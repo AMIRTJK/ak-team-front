@@ -74,7 +74,7 @@ export const Reviews = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.15 }}
-              className="relative flex flex-col justify-between overflow-hidden rounded-3xl border border-white/10 bg-white/[0.02] p-6 transition-all duration-300 hover:border-[#C8FF12]/30 hover:bg-white/[0.04] md:p-8 group"
+              className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-white/10 bg-white/[0.02] p-6 transition-colors duration-300 hover:border-[#C8FF12]/30 hover:bg-white/[0.04] md:p-8"
             >
               {/* Subtle hover glow effect */}
               <div className="absolute -right-24 -top-24 h-48 w-48 rounded-full bg-[#C8FF12]/5 blur-3xl opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
