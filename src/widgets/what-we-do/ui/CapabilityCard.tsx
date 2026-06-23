@@ -5,16 +5,21 @@ interface CapabilityCardProps {
   tags: string[];
 }
 
+// Общие классы для декоративного SVG-узора: позиционирование, мягкая
+// подсветка по hover и анимация (классы cap-* объявлены в globals.css).
+const PATTERN_BASE =
+  "absolute pointer-events-none text-white/[0.14] group-hover:text-[#C8FF12]/35 transition-colors duration-500";
+
 const CapabilityBackground = ({ index }: { index: string }) => {
   if (index === "01") {
-    // Concentric circles (Web Development)
+    // Concentric circles (Web Development) — пульсируют волной от центра
     return (
       <svg
-        className="absolute -top-10 -left-10 w-44 h-44 text-white/[0.03] group-hover:text-[#C8FF12]/10 transition-colors duration-500 pointer-events-none"
+        className={`${PATTERN_BASE} cap-ripple -top-10 -left-10 w-44 h-44`}
         viewBox="0 0 120 120"
         fill="none"
         stroke="currentColor"
-        strokeWidth="0.8"
+        strokeWidth="1.2"
         aria-hidden="true"
       >
         <circle cx="30" cy="30" r="15" />
@@ -27,39 +32,41 @@ const CapabilityBackground = ({ index }: { index: string }) => {
     );
   }
   if (index === "02") {
-    // Overlapping rotated rounded rects (Frontend / UI design)
+    // Overlapping rotated rounded rects (Frontend / UI design) — медленно вращаются
     return (
       <svg
-        className="absolute -top-10 -left-10 w-36 h-36 text-white/[0.03] group-hover:text-[#C8FF12]/10 transition-colors duration-500 pointer-events-none"
+        className={`${PATTERN_BASE} -top-10 -left-10 w-36 h-36`}
         viewBox="0 0 100 100"
         fill="none"
         stroke="currentColor"
-        strokeWidth="0.8"
+        strokeWidth="1.2"
         aria-hidden="true"
       >
-        <rect x="20" y="20" width="45" height="45" rx="8" transform="rotate(15, 42.5, 42.5)" />
-        <rect x="20" y="20" width="45" height="45" rx="8" transform="rotate(30, 42.5, 42.5)" />
-        <rect x="20" y="20" width="45" height="45" rx="8" transform="rotate(45, 42.5, 42.5)" />
-        <rect x="20" y="20" width="45" height="45" rx="8" transform="rotate(60, 42.5, 42.5)" />
+        <g className="cap-spin">
+          <rect x="20" y="20" width="45" height="45" rx="8" transform="rotate(15, 42.5, 42.5)" />
+          <rect x="20" y="20" width="45" height="45" rx="8" transform="rotate(30, 42.5, 42.5)" />
+          <rect x="20" y="20" width="45" height="45" rx="8" transform="rotate(45, 42.5, 42.5)" />
+          <rect x="20" y="20" width="45" height="45" rx="8" transform="rotate(60, 42.5, 42.5)" />
+        </g>
       </svg>
     );
   }
   if (index === "03") {
-    // Interconnected nodes (Backend / APIs / Data structures)
+    // Interconnected nodes (Backend / APIs) — узлы пульсируют, по связям бегут данные
     return (
       <svg
-        className="absolute -top-6 -left-6 w-36 h-36 text-white/[0.03] group-hover:text-[#C8FF12]/10 transition-colors duration-500 pointer-events-none"
+        className={`${PATTERN_BASE} cap-flow -top-6 -left-6 w-36 h-36`}
         viewBox="0 0 100 100"
         fill="none"
         stroke="currentColor"
-        strokeWidth="0.8"
+        strokeWidth="1.2"
         aria-hidden="true"
       >
         <circle cx="25" cy="25" r="3.5" fill="currentColor" />
         <circle cx="65" cy="25" r="3.5" fill="currentColor" />
         <circle cx="45" cy="65" r="3.5" fill="currentColor" />
         <circle cx="85" cy="55" r="3.5" fill="currentColor" />
-        
+
         <line x1="25" y1="25" x2="65" y2="25" />
         <line x1="25" y1="25" x2="45" y2="65" />
         <line x1="65" y1="25" x2="45" y2="65" />
@@ -69,31 +76,31 @@ const CapabilityBackground = ({ index }: { index: string }) => {
     );
   }
   if (index === "04") {
-    // Hexagonal expansion layout (DevOps / Docker / CI/CD)
+    // Hexagonal radar (DevOps / Docker / CI/CD) — гексагоны расходятся кольцами
     return (
       <svg
-        className="absolute -top-12 -left-12 w-44 h-44 text-white/[0.03] group-hover:text-[#C8FF12]/10 transition-colors duration-500 pointer-events-none"
+        className={`${PATTERN_BASE} cap-expand -top-12 -left-12 w-44 h-44`}
         viewBox="0 0 120 120"
         fill="none"
         stroke="currentColor"
-        strokeWidth="0.8"
+        strokeWidth="1.2"
         aria-hidden="true"
       >
         <polygon points="35,15 70,15 87,45 70,75 35,75 18,45" />
-        <polygon points="35,15 70,15 87,45 70,75 35,75 18,45" transform="scale(1.25) translate(-8, -8)" />
-        <polygon points="35,15 70,15 87,45 70,75 35,75 18,45" transform="scale(1.5) translate(-14, -14)" />
+        <polygon points="35,15 70,15 87,45 70,75 35,75 18,45" />
+        <polygon points="35,15 70,15 87,45 70,75 35,75 18,45" />
       </svg>
     );
   }
   // index === "05" or default
-  // Neural net rays & concentric dashed rings (AI solutions)
+  // Neural net rays & concentric dashed rings (AI solutions) — кольца вращаются как сканер
   return (
     <svg
-      className="absolute -top-10 -left-10 w-40 h-40 text-white/[0.03] group-hover:text-[#C8FF12]/10 transition-colors duration-500 pointer-events-none"
+      className={`${PATTERN_BASE} -top-10 -left-10 w-40 h-40`}
       viewBox="0 0 100 100"
       fill="none"
       stroke="currentColor"
-      strokeWidth="0.8"
+      strokeWidth="1.2"
       aria-hidden="true"
     >
       <line x1="20" y1="20" x2="95" y2="95" />
@@ -101,10 +108,12 @@ const CapabilityBackground = ({ index }: { index: string }) => {
       <line x1="20" y1="20" x2="20" y2="85" />
       <line x1="20" y1="20" x2="65" y2="40" />
       <line x1="20" y1="20" x2="40" y2="65" />
-      <circle cx="20" cy="20" r="18" strokeDasharray="3 3" />
-      <circle cx="20" cy="20" r="32" strokeDasharray="3 3" />
-      <circle cx="20" cy="20" r="46" strokeDasharray="3 3" />
-      <circle cx="20" cy="20" r="60" strokeDasharray="3 3" />
+      <g className="cap-spin-rings">
+        <circle cx="20" cy="20" r="18" strokeDasharray="3 3" />
+        <circle cx="20" cy="20" r="32" strokeDasharray="3 3" />
+        <circle cx="20" cy="20" r="46" strokeDasharray="3 3" />
+        <circle cx="20" cy="20" r="60" strokeDasharray="3 3" />
+      </g>
     </svg>
   );
 };

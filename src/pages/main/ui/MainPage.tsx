@@ -2,6 +2,8 @@
 
 import { About } from "@/features/About";
 import { ScrollIndicator } from "@/shared/ui/ScrollIndicator";
+import { SmoothScroll } from "@/shared/ui/SmoothScroll";
+import { IntroLoader } from "@/shared/ui/IntroLoader";
 import { WhatWeDo } from "@/widgets/what-we-do";
 import { TechMarquee } from "@/widgets/tech-marquee";
 import { WebTypes } from "@/widgets/web-types";
@@ -19,22 +21,25 @@ import { TranslationProvider } from "@/shared/lib/i18n";
 export default function MainPage() {
   return (
     <TranslationProvider>
-      <main className="min-h-screen bg-[#050505] overflow-x-hidden relative font-sans flex flex-col">
-        <Home />
-        <About />
-        <ScrollIndicator />
-        <WhatWeDo />
-        <TechMarquee />
-        <WebTypes />
-        <Estimator />
-        <Work />
-        <Team />
-        <Process />
-        <Reviews />
-        <Faq />
-        <Contact />
-        <Footer />
-      </main>
+      <SmoothScroll>
+        <IntroLoader />
+        <main className="min-h-screen bg-[#050505] overflow-x-hidden relative font-sans flex flex-col">
+          <Home />
+          <About />
+          <ScrollIndicator />
+          <WhatWeDo />
+          <TechMarquee />
+          <WebTypes />
+          <Estimator />
+          <Work />
+          <Team />
+          <Process />
+          <Reviews />
+          <Faq />
+          <Contact />
+          <Footer />
+        </main>
+      </SmoothScroll>
     </TranslationProvider>
   );
 }
