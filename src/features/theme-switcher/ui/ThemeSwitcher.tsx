@@ -1,5 +1,6 @@
 "use client";
 
+import { useId } from "react";
 import { motion } from "framer-motion";
 import { useTranslation } from "@/shared/lib/i18n";
 
@@ -15,6 +16,9 @@ export const ThemeSwitcher = ({
   onChangeTheme,
 }: ThemeSwitcherProps) => {
   const { t } = useTranslation();
+  // Уникальный id на каждый инстанс свитчера (десктоп / мобильное меню),
+  // чтобы layoutId не «делился» между копиями и индикатор не перетекал.
+  const bgId = useId();
   const themes: Theme[] = ["stones", "cyber"];
 
   return (
@@ -31,7 +35,8 @@ export const ThemeSwitcher = ({
         >
           {activeTheme === theme && (
             <motion.div
-              layoutId="active-theme-bg"
+              layoutId={`active-theme-bg-${bgId}`}
+              initial={false}
               className="absolute inset-0 bg-white shadow-md rounded-full"
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
             />

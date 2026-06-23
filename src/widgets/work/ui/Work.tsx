@@ -6,10 +6,7 @@ import { ProjectCard } from "./ProjectCard";
 
 // TODO: добавить стек, ссылки (демо/GitHub) и скриншоты, когда пришлёт Амир.
 // Затем вынести в entities/project при FSD-рефакторе.
-const PROJECTS = [
-  { index: "01" },
-  { index: "02" },
-];
+const PROJECTS = [{ index: "01" }, { index: "02" }];
 
 export const Work = () => {
   const { t } = useTranslation();
@@ -44,4 +41,3 @@ export const Work = () => {
     </section>
   );
 };
-

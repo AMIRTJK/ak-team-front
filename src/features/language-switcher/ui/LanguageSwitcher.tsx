@@ -1,10 +1,14 @@
 "use client";
 
+import { useId } from "react";
 import { useTranslation } from "@/shared/lib/i18n";
 import { motion } from "framer-motion";
 
 export const LanguageSwitcher = () => {
   const { language, setLanguage } = useTranslation();
+  // Уникальный id на инстанс (десктоп / мобильное меню) — чтобы индикатор
+  // не перетекал между копиями свитчера при загрузке.
+  const bgId = useId();
 
   return (
     <div className="flex items-center bg-black/40 backdrop-blur-xl rounded-full p-1 border border-white/10 shadow-2xl">
@@ -18,7 +22,8 @@ export const LanguageSwitcher = () => {
       >
         {language === "RU" && (
           <motion.div
-            layoutId="active-lang-bg"
+            layoutId={`active-lang-bg-${bgId}`}
+            initial={false}
             className="absolute inset-0 bg-white shadow-md rounded-full"
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
           />
@@ -40,7 +45,8 @@ export const LanguageSwitcher = () => {
       >
         {language === "EN" && (
           <motion.div
-            layoutId="active-lang-bg"
+            layoutId={`active-lang-bg-${bgId}`}
+            initial={false}
             className="absolute inset-0 bg-white shadow-md rounded-full"
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
           />

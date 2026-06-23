@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { MailIcon, TelegramIcon, WhatsappIcon, Select } from "@/shared/ui";
+import { MailIcon, TelegramIcon, WhatsappIcon, Select, Reveal } from "@/shared/ui";
 import { CONTACTS } from "@/shared/config";
 import { useTranslation } from "@/shared/lib/i18n";
 
@@ -68,7 +68,7 @@ export const Contact = () => {
       className="w-full bg-gradient-to-b from-[#050505] to-[#0a0a0a] px-6 py-24 md:px-15"
     >
       <div className="mx-auto grid w-full max-w-7xl gap-12 lg:grid-cols-2">
-        <div className="flex flex-col">
+        <Reveal className="flex flex-col">
           <h2 className="text-[clamp(48px,9vw,120px)] font-semibold leading-[1.2] text-[#C8FF12]">
             {t("contact.title")}
           </h2>
@@ -100,7 +100,7 @@ export const Contact = () => {
               {CONTACTS.email}
             </a>
           </div>
-        </div>
+        </Reveal>
 
         <form
           onSubmit={handleSubmit}

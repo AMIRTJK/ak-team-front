@@ -1,7 +1,8 @@
 "use client";
 
 import { useTranslation } from "@/shared/lib/i18n";
-import { TypeCard, type WebTypeData } from "./TypeCard";
+import { Reveal } from "@/shared/ui";
+import { TypeCard } from "./TypeCard";
 
 // TODO: вынести в entities/service и связать с конструктором услуг (v2)
 const TYPES = [
@@ -24,14 +25,14 @@ export const WebTypes = () => {
       className="w-full bg-gradient-to-b from-[#0a0a0a] to-[#050505] px-6 py-24 md:px-15"
     >
       <div className="mx-auto w-full max-w-7xl">
-        <div className="flex flex-col items-center gap-8 text-center">
+        <Reveal className="flex flex-col items-center gap-8 text-center">
           <h2 className="text-[clamp(48px,11vw,160px)] font-semibold leading-[1.2] text-[#C8FF12]">
             {t("web_types.title")}
           </h2>
           <p className="mb-12 max-w-2xl text-lg text-zinc-300 md:text-2xl">
             {t("web_types.subtitle")}
           </p>
-        </div>
+        </Reveal>
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {TYPES.map((type) => (
