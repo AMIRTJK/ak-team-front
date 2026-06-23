@@ -390,8 +390,7 @@ export const translations = {
     },
     theme: {
       stones: "Stones",
-      cyber: "Cyber",
-      space: "Space"
+      cyber: "Cyber"
     }
   },
   RU: {
@@ -785,8 +784,7 @@ export const translations = {
     },
     theme: {
       stones: "Камни",
-      cyber: "Кибер",
-      space: "Космос"
+      cyber: "Кибер"
     }
   }
 };
