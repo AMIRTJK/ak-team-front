@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { useTranslation } from "@/shared/lib/i18n";
 
-export type Theme = "stones" | "cyber" | "space";
+export type Theme = "stones" | "cyber";
 
 interface ThemeSwitcherProps {
   activeTheme: Theme;
@@ -15,7 +15,7 @@ export const ThemeSwitcher = ({
   onChangeTheme,
 }: ThemeSwitcherProps) => {
   const { t } = useTranslation();
-  const themes: Theme[] = ["stones", "cyber", "space"];
+  const themes: Theme[] = ["stones", "cyber"];
 
   return (
     <div className="flex items-center bg-black/40 backdrop-blur-xl rounded-full p-1 border border-white/10 shadow-2xl">
